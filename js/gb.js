@@ -38,7 +38,7 @@ function createEmailItem(mensaje, index) {
   let read = 'bold';
   if(mensaje.labels.includes("read")) read = 'light';
   let html = '';
-  html += '<tr>' +
+  html += '<tr data-id=' + mensaje.msgid + '>' +
           ' <td class="align-middle h3' + fav + '">☆</td>' +
           ' <td class="font-weight-' + read + '">' +
           '   <p class="h5">' + mensaje.from + '</p>' +
@@ -150,5 +150,36 @@ $(function() {
     console.log("update");
     updateEmailList();
   }
+
+  $("#boton-enviar").on("click", function(event){
+    event.preventDefault();
+    let toValue = $("#email-to").val();
+    let ccValue = $("#email-cc").val();
+    let fromValue = "yo";
+    let title = $("#email-subject").val();
+    let body = $("#email-body").val();
+    ccValue = ccValue.split(",");
+    toValue = toValue.split(",");
+    toValue = toValue.concat(ccValue);
+
+    let msg = new Gb.Message(
+      Gb.Util.randomText(),
+      new Date(),
+      fromValue,
+      toValue,
+      ["sent"],
+      title,
+      body
+    )
+
+    Gb.send(msg);
+    alert("¡Mensaje enviado!");
+    updateEmailList();
+
+    $("#email-to").val("");
+    $("#email-cc").val("");
+    $("#email-subject").val("");
+    $("#email-body").val("");
+  })
 
 });
