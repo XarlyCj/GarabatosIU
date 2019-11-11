@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="/garabatos/css/custom.css">
+    <title>Garabatos - Email</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#" style="margin-left: 20px">Garabatos APP</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/garabatos/Responsable.html">Responsables <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="/garabatos/Email-enviar.html">Mail</a>
+      </li>
+        <li class="nav-item">
+        <a class="nav-link" href="/garabatos/Alumno.html">Alumnos</a>
+      </li>
+        <li class="nav-item">
+        <a class="nav-link" href="#">Profesores</a>
+      </li>
+        <li class="nav-item">
+        <a class="nav-link" href="#">Clases</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Buscar</button>
+    </form>
+  </div>
+</nav>
+
+<div class="row container-fluid email-view">
+<div class="col-sm-3">
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col"><button class="btn btn-success">&#10133;</button></th>
+          <th scope="col"></th>
+          <th scope="col"><div class="text-right"><button class="btn btn-danger">&#128465;</button></div></th>
+        </tr>
+        <tr>
+          <th colspan="3"><input class="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search"></th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+  <div class="table-responsive email-list">
+    <table class="table">
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+    
+</div>
+<div class="col-sm-8" style="margin-left: 50px;margin-top: 50px">
+<form>
+  <div class="form-group row">
+    <label for="email-to" class="col-sm-2 col-form-label">Para:</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="email-to" placeholder="Destinatarios">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="email-cc" class="col-sm-2 col-form-label">CC:</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="email-cc" placeholder="Copia">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="email-subject" class="col-sm-2 col-form-label">Asunto:</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="email-subject" placeholder="Introduzca Asunto">
+    </div>
+  </div>
+  <div class="form-group">
+    <textarea id="email-body" class="form-control" style="height:400px;"></textarea>
+  </div>
+  <div class="form-row  justify-content-between" style="margin-top: 20px">
+    <div class="">
+      <button class="btn btn-danger" id="boton-cancelar" type="submit">Cancelar</button>
+    </div>
+    <div class="">
+      <button class="btn btn-success" id="boton-enviar" type="submit">Enviar</button>
+    </div>
+  </div>
+</form>
+</div>
+</div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="js/jquery-3.3.1.js"></script>
+    <script src="js/bootstrap.bundle-4.3.1.js"></script>
+    <script src="js/tinymce.min.js"></script>
+    <script src="js/gb.js" type="module"></script>
+    <script src="js/gbapi.js" type="module"></script>
+    <script type="text/javascript">
+      tinymce.init({
+        selector: '#inputTextoEmail',
+        plugins: ['link image lists table'],
+        toolbar: 'undo redo | bold italic backcolor | alignleft aligncenter alignjustify | bullist numlist outdent indent | image link table | removeformat',
+        menubar: false,
+      });
+  </script>
+  </body>
+</html>

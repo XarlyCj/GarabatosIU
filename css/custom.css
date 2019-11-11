@@ -1,0 +1,7 @@
+.msg {
+    font-size: 60%;
+}
+
+.email-list{
+    max-height: calc(100vh - 204px);
+}
