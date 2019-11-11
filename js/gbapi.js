@@ -88,7 +88,12 @@ class Message {
         labels.forEach(label => Util.checkEnum(label, MessageLabels));
         this.title = title;   
         this.body = body;     
-    }    
+    }
+
+    remove(){
+        let pos = globalState.messages.indexOf(this);
+        globalState.messages.splice(pos, 1);
+    }
 }
 
 

@@ -88,6 +88,13 @@ function updateEmailList(){
   }
 }
 
+function resetEmailInputs() {
+  $("#email-to").val("");
+  $("#email-cc").val("");
+  $("#email-subject").val("");
+  $("#email-body").val("");
+}
+
 //
 //
 // Código de pegamento, ejecutado sólo una vez que la interfaz esté cargada.
@@ -151,7 +158,7 @@ $(function() {
     updateEmailList();
   }
 
-  $("#boton-enviar").on("click", function(event){
+  $("#email-send").on("click", function(event){
     event.preventDefault();
     let toValue = $("#email-to").val();
     let ccValue = $("#email-cc").val();
@@ -176,10 +183,27 @@ $(function() {
     alert("¡Mensaje enviado!");
     updateEmailList();
 
-    $("#email-to").val("");
-    $("#email-cc").val("");
-    $("#email-subject").val("");
-    $("#email-body").val("");
+    resetEmailInputs();
+  })
+
+  $("#email-cancel").on("click", function(event){
+    event.preventDefault();
+    resetEmailInputs();
+  })
+
+  $("#email-delete").on("click", function(){
+    if($(".email-list table input[type='checkbox']:checked").length > 0){
+      $(".email-list table input[type='checkbox']:checked").each(function(index, element){
+        console.log($(element).closest("tr").data("id"));
+        Gb.rm($(element).closest("tr").data("id"));
+      })
+      updateEmailList();
+    }
+    else{
+      alert("Selecciona al menos un mensaje");
+    }
   })
 
 });
+
+
