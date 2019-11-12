@@ -1,37 +1,5 @@
 import * as Gb from './gbapi.js'
 
-function createGroupItem(mensaje) {
-  const rid = 'x_' + Math.floor(Math.random()*1000000);
-  const hid = 'h_'+rid;
-  const cid = 'c_'+rid;
-  
-  const html = [
-    '<div class="card">',
-    '<div class="card-header" id="', hid, '">',
-    '  <h2 class="mb-0">',
-    '    <button class="btn btn-link" type="button"',
-        ' data-toggle="collapse" data-target="#', cid, '"',
-    '      aria-expanded="true" aria-controls="', rid, '">',
-    '<b class="msg mtitle">', mensaje.title, '</b>',
-    '<div class="msg mdate"> Enviado el ', 
-    new Intl.DateTimeFormat('es-ES').format(mensaje.date),
-    ' por ', mensaje.from,
-    '</div>',
-    '    </button>',
-    '  </h2>',
-    '</div>',
-    '',
-    '<div id="', cid, '" class="collapse show" aria-labelledby="', hid,'" ',
-       'data-parent="#accordionExample">',
-    '  <div class="card-body msg">',
-    mensaje.body,
-    '  </div>',
-    '</div>',
-    '</div>'
-  ];
-  return $(html.join(''));
-}
-
 function createEmailItem(mensaje, index) {
   let fav = '';
   if(mensaje.labels.includes("fav")) fav = ' font-weight-bold text-warning';
@@ -39,8 +7,8 @@ function createEmailItem(mensaje, index) {
   if(mensaje.labels.includes("read")) read = 'light';
   let html = '';
   html += '<tr data-id=' + mensaje.msgid + '>' +
-          ' <td class="align-middle h3' + fav + '">☆</td>' +
-          ' <td class="font-weight-' + read + '">' +
+          ' <td class="align-middle h3 email-fav-icon' + fav + '">☆</td>' +
+          ' <td class="font-weight-' + read + ' email-item">' +
           '   <p class="h5">' + mensaje.from + '</p>' +
           '   <p class="h7">' + mensaje.title + '</p>' +
           ' </td>' +
@@ -55,25 +23,22 @@ function createEmailItem(mensaje, index) {
   return $(html);
 }
 
-function createVmItem(params) {
-  const stateToBadge = {
-    start: 'success',
-    stop: 'danger',
-    suspend: 'secondary',
-    reset: 'warning'
-  }
-  const html = [
-    '<li id="vm_',
-    params.name,
-    '" ',
-    'class="list-group-item d-flex justify-content-between align-items-center">',
-    params.name,
-    '<span class="badge badge-',
-    stateToBadge[params.state],
-    ' badge-pill estado">&nbsp;</span>',
-    '</li>'
-  ];
-  return $(html.join(''));
+function emailSetFav(elem){
+  let msgid = $(elem).closest("tr").data("id");
+  // Falta implementación API
+}
+
+function answerEmail(event){
+  event.preventDefault();
+  let toValue = $("#email-from").text();
+  let fromValue = "yo";
+  let title = $("#email-title").text();
+  let body = $("#email-body").val();
+  toValue = toValue.split(",");
+  let msg = new Gb.Message(Gb.Util.randomText(), new Date(), fromValue, toValue, ["sent"], title, body);
+  Gb.send(msg);
+  alert("¡Mensaje enviado!");
+  updateEmailList();
 }
 
 function updateEmailList(){
@@ -81,7 +46,25 @@ function updateEmailList(){
     // vaciamos un contenedor
     $(".email-list tbody").empty();
     // y lo volvemos a rellenar con su nuevo contenido
-    Gb.globalState.messages.forEach((m, index) =>  $(".email-list tbody").append(createEmailItem(m, index)));      
+    Gb.globalState.messages.forEach((m, index) =>  $(".email-list tbody").append(createEmailItem(m, index)));
+    
+    $(".email-fav-icon").on("click", function(){
+      emailSetFav($(this));
+    })
+    $(".email-item").on("click", function(){
+      let msgid = $(this).closest("tr").data("id");
+      $(".email-container").empty().append(receivedEmailFormView(Gb.globalState.messages.find(m => { 
+        if(m.msgid == msgid) return m; 
+      })));
+      $("#email-send").on("click", function(event){
+        answerEmail(event);
+      })
+      $("#email-cancel").on("click", function(event){
+        event.preventDefault();
+        if(confirm("¿Desea cancelar?"))
+          $(".email-container").empty();
+      })
+    })
     // y asi para cada cosa que pueda haber cambiado
   } catch (e) {
     console.log('Error actualizando', e);
@@ -95,6 +78,135 @@ function resetEmailInputs() {
   $("#email-body").val("");
 }
 
+function newEmailFormView(){
+  let html = '';
+  html += '<form class="email-new-form">' +
+          ' <div class="form-group row">' +
+          '   <label for="email-to" class="col-sm-2 col-form-label">Para:</label>' +
+          '   <div class="col-sm-10">' +
+          '     <input type="text" class="form-control" id="email-to" placeholder="Destinatarios">' +
+          '   </div>' +
+          ' </div>' +
+          ' <div class="form-group row">' +
+          '    <label for="email-cc" class="col-sm-2 col-form-label">CC:</label>' +
+          '    <div class="col-sm-10">' +
+          '      <input type="text" class="form-control" id="email-cc" placeholder="Copia">' +
+          '    </div>' +
+          '  </div>' +
+          '  <div class="form-group row">' +
+          '    <label for="email-subject" class="col-sm-2 col-form-label">Asunto:</label>' +
+          '    <div class="col-sm-10">' +
+          '      <input type="text" class="form-control" id="email-subject" placeholder="Introduzca Asunto">' +
+          '    </div>' +
+          '  </div>' +
+          '  <div class="form-group">' +
+          '    <textarea id="email-body" class="form-control" style="height:400px;"></textarea>' +
+          '  </div>' +
+          '  <div class="form-row  justify-content-between" style="margin-top: 20px">' +
+          '    <div class="">' +
+          '      <button class="btn btn-danger" id="email-cancel" type="submit">Cancelar</button>' +
+          '    </div>' +
+          '    <div class="">' +
+          '      <button class="btn btn-success" id="email-send" type="submit">Enviar</button>' +
+          '    </div>' +
+          '  </div>' +
+          '</form>'
+  return $(html);
+}
+
+function receivedEmailFormView(mensaje){
+  let html = '';
+  html += '<form>' +
+          ' <div class="form-group row">' +
+          '   <label for="formGroupExampleInput" class="col-sm-2 col-form-label">Emisor:</label>' +
+          '   <div class="col-sm-10 my-auto">' +
+          '     <span id="email-from">' + mensaje.from + '</span>' +
+          '   </div>' +
+          ' </div>' +
+          ' <div class="form-group row">' +
+          '   <label for="formGroupExampleInput" class="col-sm-2 col-form-label">Asunto:</label>' +
+          '   <div class="col-sm-10 my-auto">' +
+          '     <span id="email-title">' + mensaje.title + '</span>' +
+          '   </div>' +
+          ' </div>' +
+          ' <div>' +
+          '   <textarea style="height:100px;width:100%;" disabled>' + mensaje.body + '</textarea>' +
+          ' </div>' +
+          ' <div class="form-group">' +
+          '   <textarea id="email-body" class="form-control" style="height:400px;">' +
+          '\n\n\n' +
+          '--------------------------------------------------------------------------\n' +
+          'De: ' + mensaje.from + '\n' +
+          'Para: ' + mensaje.to + '\n' +
+          mensaje.body +
+          '   </textarea>' +
+          ' </div>' +
+          ' <div class="form-row  justify-content-between" style="margin-top: 20px">' +
+          '   <div class="">' +
+          '     <button class="btn btn-danger" id="email-cancel" type="submit">Cancelar</button>' +
+          '   </div>' +
+          '   <div class="">' +
+          '     <button class="btn btn-success" id="email-send" type="submit">Enviar</button>' +
+          '   </div>' +
+          ' </div>' +
+          '</form>';
+
+  return $(html);
+}
+
+function sendNewEmail(event) {
+  event.preventDefault();
+  let toValue = $("#email-to").val();
+  let ccValue = $("#email-cc").val();
+  let fromValue = "yo";
+  let title = $("#email-subject").val();
+  let body = $("#email-body").val();
+  ccValue = ccValue.split(",");
+  toValue = toValue.split(",");
+  toValue = toValue.concat(ccValue);
+  let msg = new Gb.Message(Gb.Util.randomText(), new Date(), fromValue, toValue, ["sent"], title, body);
+  Gb.send(msg);
+  alert("¡Mensaje enviado!");
+  updateEmailList();
+  resetEmailInputs();
+}
+
+// Student
+function createStudentItem(s){
+  let html = `<tr>
+                  <td><div id="${s.sid}" class="student-index" >${s.first_name} ${s.last_name} ( Class: ${s.cid} )</div></td>
+              </tr>`;
+  $(".student-list").append(html);
+}
+
+function getStudentFromState(sid){
+  let resp = undefined;
+  $.each(Gb.globalState.students, function (index, student) {
+    console.log(student.sid + " == " + sid);
+    if (student.sid == sid){
+      resp = student;
+    }
+  });
+  return resp;
+}
+
+function deleteStudentFromState(sid){
+  $.each(Gb.globalState.students, function (index, student) {
+    if (student.sid == sid){
+      delete Gb.globalState.students[index];
+    }
+  });
+}
+
+
+function dispatchStudentView(div){
+  let opts = $.find('.student-opt');
+  $.each(opts, function (index, opt) {
+    $(opt).hide();
+  });
+  $('.' + div).show();
+}
+
 //
 //
 // Código de pegamento, ejecutado sólo una vez que la interfaz esté cargada.
@@ -102,19 +214,6 @@ function resetEmailInputs() {
 //
 //
 $(function() { 
-  
-  // funcion de actualización de ejemplo. Llámala para refrescar interfaz
-  window.demo = function update(result) {
-    try {
-      // vaciamos un contenedor
-      $("#accordionExample").empty();
-      // y lo volvemos a rellenar con su nuevo contenido
-      Gb.globalState.messages.forEach(m =>  $("#accordionExample").append(createGroupItem(m)));      
-      // y asi para cada cosa que pueda haber cambiado
-    } catch (e) {
-      console.log('Error actualizando', e);
-    }
-  }
 
   // expone Gb para que esté accesible desde la consola
   window.Gb = Gb;
@@ -158,6 +257,9 @@ $(function() {
     updateEmailList();
   }
 
+  /*#####################
+  # Email
+  #####################*/
   $("#email-send").on("click", function(event){
     event.preventDefault();
     let toValue = $("#email-to").val();
@@ -177,22 +279,20 @@ $(function() {
       ["sent"],
       title,
       body
-    )
+    );
 
     Gb.send(msg);
     alert("¡Mensaje enviado!");
     updateEmailList();
 
     resetEmailInputs();
-  })
 
-  /*#####################
-  # Email
-  #####################*/
+  });
+
   $("#email-cancel").on("click", function(event){
     event.preventDefault();
     resetEmailInputs();
-  })
+  });
 
   $("#email-delete").on("click", function(){
     if($(".email-list table input[type='checkbox']:checked").length > 0){
@@ -205,50 +305,75 @@ $(function() {
     else{
       alert("Selecciona al menos un mensaje");
     }
-  })
+  });
 
+  $("#email-new").on("click", function(){
+
+    $(".email-container").empty().append(newEmailFormView());
+
+    $("#email-send").on("click", function(event){
+      sendNewEmail(event);
+    })
+
+    $("#email-cancel").on("click", function(event){
+      event.preventDefault();
+      if(confirm("¿Desea cancelar?"))
+        resetEmailInputs();
+    })
+
+  });
 
   /*#####################
   # Student
   #####################*/
   $(".btn-student-form").on("click", function(){
-    let opts = $.find('.student-opt');
-    $.each(opts, function (index, opt) {
-        $(opt).hide();
-    });
-    $('.student-opt-form').show();
+    dispatchStudentView("student-opt-form");
   });
 
   $("#btn-student-send").on("click", function(event){
+
       event.preventDefault();
       let form = $(".student-form-create");
       let inputs = form.find(".form-control");
+      let param = {};
+
       $.each(inputs,function (key, input) {
-        console.log(input.id);
-        console.log(input.value);
-      })
+        param[input.id] = input.value;
+      });
+
+      let s = new Gb.Student(param.sid, param.first_name, param.last_name, param.cid, [] );
+      try {
+        Gb.addStudent(s);
+        createStudentItem(s);
+      } catch (e) {
+        alert('Alumno ya existe con ese ID');
+      }
   });
 
-  /*
+  $(".student-list").on("click", function(event){
+    let target = event.target,
+        sid = target.id,
+        student = getStudentFromState(sid),
+        form = $(".student-opt-form-edit"),
+        inputs = form.find(".form-control");
 
-  Gb.globalState
+    console.log(inputs);
 
-  class Student {
-      constructor(sid, first_name, last_name, cid, guardians) {
-        this.sid = sid;
-        this.first_name = first_name;
-        this.last_name = last_name;
-        this.cid = cid;
-        this.guardians = guardians || []; // profes; por UIDs (dnis o similar de "User")
-      }
-  }
+    $.each(inputs, function (index, input) {
+      console.log("input",  input.id);
+      let editId = input.id,
+          id = editId.replace("edit-", "");
+      let sele = $("input[id=" + editId + "]");
+      console.log(sele);
+      sele.val(student[id]);
+    });
 
-  function addStudent(student) {
-    getId(student.sid, student);
-    globalState.students.push(student);
-  }
+    dispatchStudentView("student-opt-edit");
+  });
 
-  */
+  $("deleteamdeioas").on("click", function () {
+      //button get cosas blablabla
+      deleteStudentFromState(sid);
+  })
+
 });
-
-

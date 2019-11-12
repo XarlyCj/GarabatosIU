@@ -14,6 +14,13 @@
         margin-top:  50px;
         display: none;
       }
+      .table td, .table th{
+        border-top: none;
+      }
+
+      .table td{
+        width: 100%;
+      }
     </style>
 
     <title>Alumnos</title>
@@ -53,7 +60,7 @@
     <div class="row"> 
       <div class ="col-sm-3">
         <div class="table-responsive">
-          <table class="table">
+          <table class="table table-striped">
             <thead>
               <tr>
                 <th scope="col"><button class="btn btn-student-form btn-success"> &#10133;</button></th>
@@ -64,35 +71,12 @@
                 <th colspan="3"><input class="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search"></th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <th scope="row">1</th>
-                  <td>Mark Ruffalo</td>
-                  <td><div class="form-check float-right">
-                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                    <label class="form-check-label" for="defaultCheck1"></label>
-                  </td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Jacob stan</td>
-                <td><div class="form-check float-right">
-                  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                  <label class="form-check-label" for="defaultCheck1"></label>
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry skel</td>
-                <td><div class="form-check float-right">
-                  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                  <label class="form-check-label" for="defaultCheck1"></label>
-                </td>
-              </tr>
+            <tbody class="student-list" >
             </tbody>
           </table>
         </div>
       </div>
+      <!-- Create -->
       <div class="col-sm-6 student-opt student-opt-form" >
         <form class="student-form-create">
           <div class="form-group">
@@ -116,6 +100,36 @@
             <div class="form-row  justify-content-between" style="margin-top: 20px">
               <div class="">
                 <button class="btn btn-success" id="btn-student-send" >Insertar Alumno</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <!-- Edit -->
+      <div class="col-sm-6 student-opt student-opt-edit" >
+        <form class="student-opt-form-edit">
+          <div class="form-group">
+            <label for="sid">DNI</label>
+            <input type="text" class="form-control" id="edit-sid" value="">
+          </div>
+          <div class="form-group">
+            <label for="first_name">Nombre</label>
+            <input type="text" class="form-control" id="edit-first_name" value="">
+          </div>
+          <div class="form-group">
+            <label for="last_name">Apellidos</label>
+            <input type="text" class="form-control" id="edit-last_name" value="">
+          </div>
+          <div class="form-group">
+            <label for="cid">Clase</label>
+            <input type="text" class="form-control" id="cid" value="">
+          </div>
+          <div class="form-group">
+
+            <div class="form-row  justify-content-between" style="margin-top: 20px">
+              <div >
+                <button class="btn btn-danger" value="" id="btn-student-delete" >Eliminar Alumno</button>
+                <button class="btn btn-success" id="btn-student-edit" >Editar Alumno</button>
               </div>
             </div>
           </div>

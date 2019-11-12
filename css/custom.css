@@ -5,3 +5,9 @@
 .email-list{
     max-height: calc(100vh - 204px);
 }
+
+.email-fav-icon,
+.email-item{
+    cursor: pointer;
+}
+
