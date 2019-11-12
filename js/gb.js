@@ -193,7 +193,8 @@ function getStudentFromState(sid){
 function deleteStudentFromState(sid){
   $.each(Gb.globalState.students, function (index, student) {
     if (student.sid == sid){
-      delete Gb.globalState.students[index];
+      console.log(student);
+      Gb.globalState.students.splice(index, 1);
     }
   });
 }
@@ -209,8 +210,9 @@ function editStudentFromState(s) {
 }
 
 function repaintStudents() {
+  $(".student-list").empty();
   $.each(Gb.globalState.students, function (index, student) {
-    createStudentItem(student);
+      createStudentItem(student);
   });
 }
 
@@ -386,22 +388,21 @@ $(function() {
     dispatchStudentView("student-opt-edit");
   });
 
-  $(".btn-student-delete").on("click", function () {
-      //button get cosas blablabla
-      let sid = $("input[id='edit-sid']");
+  $("#btn-student-delete").on("click", function (event) {
+      event.preventDefault();
+      let sid = $("input[id='edit-sid']").value;
       deleteStudentFromState(sid);
-      let div = $("#" + sid);
-      let tr = div.closest( "tr" );
-      tr.remove();
+      repaintStudents();
+  });
 
-  })
-
-  $(".btn-student-edit").on("click", function () {
+  $("#btn-student-edit").on("click", function (event) {
+    event.preventDefault();
     //button get cosas blablabla
-    let sid = $("input[id='edit-sid']");
-    let first_name = $("input[id='edit-first_name']");
-    let last_name = $("input[id='edit-last_name']");
-    let cid = $("input[id='edit-cid']");
+    let sid = $("input[id='edit-sid']").value;
+    let first_name = $("input[id='edit-first_name']").value;
+    let last_name = $("input[id='edit-last_name']").value;
+    let cid = $("input[id='edit-cid']").value;
+    console.log(sid, first_name, last_name, cid);
     let s = new Gb.Student(sid, first_name, last_name, cid, [] );
     editStudentFromState(s);
     repaintStudents();
