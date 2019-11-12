@@ -61,7 +61,12 @@ class User {
         this.tels = tels || [];
         this.classes = classes || [];   // cids de clases en las que tiene alumnos (admin: todas)
         this.students = students || []; // students; por SIDs; sólo para guardian
-    }    
+    }
+
+    remove(){
+        let pos = globalState.users.indexOf(this);
+        globalState.users.splice(pos, 1);
+    }
 }
 
 /**
