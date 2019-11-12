@@ -8,6 +8,14 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
+    <style>
+      .student-opt{
+        margin-left: 50px;
+        margin-top:  50px;
+        display: none;
+      }
+    </style>
+
     <title>Alumnos</title>
   </head>
   <body>
@@ -46,10 +54,9 @@
       <div class ="col-sm-3">
         <div class="table-responsive">
           <table class="table">
-            <caption style ="margin-left: 10px">Lista de Alumnos</caption>
             <thead>
               <tr>
-                <th scope="col"><button class="btn btn-success">&#10133;</button></th>
+                <th scope="col"><button class="btn btn-student-form btn-success"> &#10133;</button></th>
                 <th scope="col"></th>
                 <th scope="col"><div class="text-right"><button class="btn btn-danger">&#128465;</button></div></th>
               </tr>
@@ -86,29 +93,29 @@
           </table>
         </div>
       </div>
-      <div class="col-sm-6" style="margin-left: 50px;margin-top: 50px">
-        <form>
+      <div class="col-sm-6 student-opt student-opt-form" >
+        <form class="student-form-create">
           <div class="form-group">
-            <label for="formGroupExampleInput">Nombre</label>
-            <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Inserta Nombre">
+            <label for="sid">DNI</label>
+            <input type="text" class="form-control" id="sid" placeholder="Inserta DNI">
           </div>
           <div class="form-group">
-            <label for="formGroupExampleInput2">Apellidos</label>
-            <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="Inserta Apellidos">
+            <label for="first_name">Nombre</label>
+            <input type="text" class="form-control" id="first_name" placeholder="Inserta Nombre">
           </div>
           <div class="form-group">
-            <label for="formGroupExampleInput">Responsable </label>
-            <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Inserta Responsable">
+            <label for="last_name">Apellidos</label>
+            <input type="text" class="form-control" id="last_name" placeholder="Inserta Apellidos">
           </div>
           <div class="form-group">
-            <label for="formGroupExampleInput">Clase</label>
-            <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Inserta el Nº de Clase">
+            <label for="cid">Clase</label>
+            <input type="text" class="form-control" id="cid" placeholder="Inserta Clase">
+          </div>
+          <div class="form-group">
+
             <div class="form-row  justify-content-between" style="margin-top: 20px">
               <div class="">
-                <button class="btn btn-danger" id="boton-publicar" type="submit">Cancelar</button>
-              </div>
-              <div class="">
-                <button class="btn btn-success" id="boton-publicar" type="submit">Insertar Responsable</button>
+                <button class="btn btn-success" id="btn-student-send" >Insertar Alumno</button>
               </div>
             </div>
           </div>
@@ -117,9 +124,12 @@
     </div>
   </body>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script src="js/gbapi.js" type="module"></script>
+  <script src="js/gb.js" type="module"></script>
 </html>

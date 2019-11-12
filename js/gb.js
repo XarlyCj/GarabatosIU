@@ -186,6 +186,9 @@ $(function() {
     resetEmailInputs();
   })
 
+  /*#####################
+  # Email
+  #####################*/
   $("#email-cancel").on("click", function(event){
     event.preventDefault();
     resetEmailInputs();
@@ -204,6 +207,48 @@ $(function() {
     }
   })
 
+
+  /*#####################
+  # Student
+  #####################*/
+  $(".btn-student-form").on("click", function(){
+    let opts = $.find('.student-opt');
+    $.each(opts, function (index, opt) {
+        $(opt).hide();
+    });
+    $('.student-opt-form').show();
+  });
+
+  $("#btn-student-send").on("click", function(event){
+      event.preventDefault();
+      let form = $(".student-form-create");
+      let inputs = form.find(".form-control");
+      $.each(inputs,function (key, input) {
+        console.log(input.id);
+        console.log(input.value);
+      })
+  });
+
+  /*
+
+  Gb.globalState
+
+  class Student {
+      constructor(sid, first_name, last_name, cid, guardians) {
+        this.sid = sid;
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.cid = cid;
+        this.guardians = guardians || []; // profes; por UIDs (dnis o similar de "User")
+      }
+  }
+
+  function addStudent(student) {
+    getId(student.sid, student);
+    globalState.students.push(student);
+  }
+
+  */
 });
 
 
