@@ -198,6 +198,21 @@ function deleteStudentFromState(sid){
   });
 }
 
+function editStudentFromState(s) {
+  $.each(Gb.globalState.students, function (index, student) {
+    if (student.sid == s.sid){
+      student.first_name = s.first_name;
+      student.last_name = s.last_name;
+      student.cid = s.cid;
+    }
+  });
+}
+
+function repaintStudents() {
+  $.each(Gb.globalState.students, function (index, student) {
+    createStudentItem(student);
+  });
+}
 
 function dispatchStudentView(div){
   let opts = $.find('.student-opt');
@@ -371,9 +386,25 @@ $(function() {
     dispatchStudentView("student-opt-edit");
   });
 
-  $("deleteamdeioas").on("click", function () {
+  $(".btn-student-delete").on("click", function () {
       //button get cosas blablabla
+      let sid = $("input[id='edit-sid']");
       deleteStudentFromState(sid);
+      let div = $("#" + sid);
+      let tr = div.closest( "tr" );
+      tr.remove();
+
+  })
+
+  $(".btn-student-edit").on("click", function () {
+    //button get cosas blablabla
+    let sid = $("input[id='edit-sid']");
+    let first_name = $("input[id='edit-first_name']");
+    let last_name = $("input[id='edit-last_name']");
+    let cid = $("input[id='edit-cid']");
+    let s = new Gb.Student(sid, first_name, last_name, cid, [] );
+    editStudentFromState(s);
+    repaintStudents();
   })
 
 });
