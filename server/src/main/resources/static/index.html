@@ -7,50 +7,27 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="/garabatos/GarabatosIU/css/custom.css">
+    <link rel="stylesheet" href="css/custom.css">
     <title>Garabatos - Email</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#" style="margin-left: 20px">Garabatos APP</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item">
-                <a class="nav-link" href="Responsable.html">Responsables </a>
-              </li>
-              <li class="nav-item active">
-                <a class="nav-link" href="Email-enviar.html">Mail</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="Alumno.html">Alumnos</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="Profesor.html">Profesores</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="Clase.html">Clases</a>
-              </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0">
-              <input class="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search">
-              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Buscar</button>
-            </form>
-          </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light superior-nav">
+      <h1 class="navbar-brand">Garabatos</h1>
     </nav>
-
-    <section class="row container-fluid">
-    <div id="section-list">
-        <ul>
-            <li>
-                <div class="student-index" id="uid"></div>
-            </li>
-        </ul>
-    </div>
-    <div class="app-container"></div>
+    <section class="main-view container-fluid">
+      <div class="d-flex justify-content-center text-center">
+        <form class="login">
+            <div class="form-group">
+                <label for="login-user">Usuario:</label>
+                <input type="text" class="form-control" id="login-user" placeholder="Usario" required/>
+            </div>
+            <div class="form-group">
+                <label for="login-password">Contraseña:</label>
+                <input type="password" class="form-control" id="login-password" placeholder="Contraseña" required/>
+            </div>
+            <button class="btn btn-primary" id="login-submit" type="submit">Iniciar sesión</button>
+          </form>
+      </div>
     </section>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

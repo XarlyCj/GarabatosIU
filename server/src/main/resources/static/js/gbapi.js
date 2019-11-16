@@ -1,7 +1,14 @@
 "use strict"
 
-// uses ES6 module notation (export statement is at the very end)
-// see https://medium.freecodecamp.org/anatomy-of-js-module-systems-and-building-libraries-fadcd8dbd0e
+/**
+ * Librería de cliente para interaccionar con el servidor de Garabatos.
+ * Prácticas de IU 2019-20
+ *
+ * Para las prácticas, por favor - NO TOQUES ESTE CÓDIGO.
+ *
+ * Fuera de las prácticas, lee la licencia: dice lo que puedes hacer con él, que es esencialmente
+ * lo que quieras siempre y cuando no digas que lo escribiste tú o me persigas por haberlo escrito mal.
+ */
 
 /**
  * El estado global de la aplicación.
@@ -52,21 +59,17 @@ const UserRoles = {
  * Un usuario no-estudiante
  */
 class User {
-    constructor(uid, type, first_name, last_name, tels, classes, students) {
+    constructor(uid, type, first_name, last_name, tels, classes, students, pass) {
         this.uid = uid;
         Util.checkEnum(type, UserRoles);
         this.type = type;
         this.first_name = first_name;
         this.last_name = last_name;
         this.tels = tels || [];
-        this.classes = classes || [];   // cids de clases en las que tiene alumnos (admin: todas)
-        this.students = students || []; // students; por SIDs; sólo para guardian
-    }
-
-    remove(){
-        let pos = globalState.users.indexOf(this);
-        globalState.users.splice(pos, 1);
-    }
+        this.classes = classes || [];   // cids de clases en las que tiene alumnos (solo si profe)
+        this.students = students || []; // students; por SIDs (solo si padre)
+        this.password = pass;
+    }    
 }
 
 /**
@@ -84,21 +87,20 @@ const MessageLabels = {
  * Un mensaje
  */
 class Message {
-    constructor(msgid, date, from, to, labels, title, body) {
+    constructor(msgid, date, from, to, labels, title, body, parent) {
         this.msgid = msgid;
         this.date = date || new Date(),
         this.from = from;
-        this.to = to;               // if array, contains UIDs. Otherwise, either a MSGID (=reply) or CID (=class)
+        if (parent) {
+            this.parent = parent; // msgid of parent, only if reply. If reply, no "to"
+        } else {
+            this.to = to;               // array with UIDs and/or CIDs (to send to aclass)
+        }
         this.labels = labels || []; // of MessageLabels
         labels.forEach(label => Util.checkEnum(label, MessageLabels));
         this.title = title;   
         this.body = body;     
-    }
-
-    remove(){
-        let pos = globalState.messages.indexOf(this);
-        globalState.messages.splice(pos, 1);
-    }
+    }    
 }
 
 
@@ -144,6 +146,13 @@ class Util {
       return new Array(n).fill('').map(() => this.randomChar(valid)).join('');
     }
 
+    static randomPass() {
+      const n = 7;
+      const prefix = this.randomChar(UPPER) + this.randomChar(LOWER) + this.randomChar(DIGITS);
+      const valid = UPPER + LOWER + DIGITS;
+      return prefix + new Array(n-3).fill('').map(() => this.randomChar(valid)).join('');
+    }
+
     /**
      * Genera un identificador "unico" de 5 caracteres
      */
@@ -175,7 +184,7 @@ class Util {
      */
     static randomDate(fechaIni, maxDias) {
         let dia = new Date(fechaIni);
-        dia.setDate(dia.getDate() + Util.randomInRange(1, maxDias));
+        dia.setDate(dia.getDate() - Util.randomInRange(1, maxDias));
         return dia;
     }
 
@@ -212,12 +221,13 @@ class Util {
             Util.randomString(), 
             type,
             Util.randomText(1), Util.randomText(2, true), 
-            Util.fill(Util.randomInRange(0, 2), () => {
+            Util.fill(Util.randomInRange(1, 3), () => {
                 return Util.fill(3, ()=>""+Util.randomInRange(100, 999))
                     .join('-')
             }),
             classes,
-            students
+            students,
+            Util.randomPass()
         );
         return u;        
     }    
@@ -263,53 +273,127 @@ function getId(id, object) {
     }
 }
 
+// sube datos en json, espera json de vuelta; lanza error por fallos (status != 200)
+function go(url, method, data = {}) {
+  let params = {
+    method: method, // POST, GET, POST, PUT, DELETE, etc.
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+    },
+    body: JSON.stringify(data)
+  };
+  if (method === "GET") {
+	  // GET requests cannot have body; I could URL-encode, but it would not be used here
+	  delete params.body;
+  }
+  console.log("sending", url, params)
+  return fetch(url, params).then(response => {
+    if (response.ok) {
+        return data = response.json();
+    } else {
+        response.text().then(t => {throw new Error(t + ", at " + url)});
+    }
+  })
+}
+
+// actualiza el estado de la aplicación con el resultado de una petición
+function updateState(data) {
+    if (data === undefined) {
+        return; // excepto si la petición no devuelve nada
+    }
+    cache = {};
+    globalState = new GlobalState(data.classes, data.students, data.users, data.messages);
+    globalState.classes.forEach(o => getId(o.cid, o));
+    globalState.students.forEach(o => getId(o.sid, o));
+    globalState.users.forEach(o => getId(o.uid, o));
+    globalState.messages.forEach(o => getId(o.msgid, o));
+    console.log("Updated state", globalState);
+    return data;
+}
+
 // el estado global
 let globalState = new GlobalState();   
+
+// la direccion del servidor
+let serverApiUrl = "//localhost:8080/api/";
+
+// el token actual (procedente del ultimo login)
+let serverToken = "no-has-hecho-login";
+
+// llama a esto con la URL de la api a la que te quieres conectar
+function connect(apiUrl) {
+    serverApiUrl = apiUrl;
+    serverToken = "no-has-hecho-login";
+}
 
 // acceso externo a la cache
 function resolve(id) {
     return cache[id];
 }
 
+// hace login. Todas las futuras operaciones usan el token devuelto
 function login(uid, pass) {
-    // NOP por ahora
+    return go(serverApiUrl + "login", 'POST', {uid: uid, password: pass})
+        .then(d => { if (!d) return; serverToken = d.token; return updateState(d);});
 }
 
+// hace logout, destruyendo el token usado
+function logout(id) {
+    return go(serverApiUrl + serverToken + "/logout", 'POST');
+}
+
+// añade una nueva clase; alumnos y profes, si se especifican, deben existir
 function addClass(eclass) {
-    getId(eclass.cid, eclass);
-    globalState.classes.push(eclass);
+    return go(serverApiUrl + serverToken + "/addclass", 'POST', eclass)
+        .then(d => updateState(d));
 }
 
+// añade un nuevo alumno; clases y padres, si se especifican, deben existir
 function addStudent(student) {
-    getId(student.sid, student);
-    globalState.students.push(student);
+    return go(serverApiUrl + serverToken + "/addstudent", 'POST', student)
+        .then(d => updateState(d));
 }
 
+// añade un usuario; debe incluir tipo, uid, contraseña, y al menos 1 telefono
 function addUser(user) {
-    getId(user.uid, user);
-    globalState.users.push(user);
+    return go(serverApiUrl + serverToken + "/adduser", 'POST', user)
+        .then(d => updateState(d));
 }
 
+// elimina un objeto, por id
 function rm(id) {
-    let o = getId(id);
-    o.remove();     // FIXME: implementar en cada clase
-    delete cache[id];
+    return go(serverApiUrl + serverToken + "/rm/" + id, 'POST')
+        .then(d => updateState(d));
 }
 
-function set(id, value) {
-    let o = getId(id);
-    o.set(value);   // FIXME: implementar en cada clase
+// modifica un objeto. Cualquier referencia debe existir
+function set(o) {
+    return go(serverApiUrl + serverToken + "/set/", 'POST', o)
+        .then(d => updateState(d));
 }
 
+// envia un mensaje
 function send(message) {
-    getId(message.msgid, message);
-    globalState.messages.push(message);
+    return go(serverApiUrl + serverToken + "/send", 'POST', message)
+        .then(d => updateState(d));
 }
 
-// lists symbols that will be available outside this module
+// actualiza el estado de la aplicación
+function list() {
+    return go(serverApiUrl + serverToken + "/list", 'POST')
+        .then(d => updateState(d));
+}
+
+// inicializa la aplicación del servidor -- pero sólo cuando está 100% vací
+function initialize() {
+    return go(serverApiUrl + "initialize", 'GET')
+        .then(d => console.log(d));
+}
+
+// cosas que estarán disponibles desde fuera de este módulo
 export {
   
-  // Classes
+  // Clases
   EClass,        // a class; uses cid as id
   Student,       // a student; uses sid as id
   UserRoles,     // possible user roles
@@ -318,19 +402,24 @@ export {
   Message,       // a message; uses msgid
   GlobalState,   // the whole state of the application
   
-  // State
-  globalState,   // state of the application. What you should display 
+  // Estado
+  globalState,   // el estado de la aplicación, según la última respuesta
   resolve,       // consulta un id en la cache
+  connect,       // establece URL del servidor. Debe llamarse antes de nada
 
-  // Methods. All use the token returned by login, and update globalState
-  login,       // (uid, pass)
+  // Métodos. Todos (menos login / initialize) usan el token que devuelve login
+  login,       // (uid, pass) --> returns valid token for user
+  logout,      // ()          --> deletes a valid token
   addClass,    // (eclass)
   addStudent,  // (student)
   addUser,     // (user)
   rm,          // (cid || sid || uid || msgid) 
-  set,         // (cid || sid || uid || msgid, eclass || student || user || message)
+  set,         // (eclass || student || user || message)
   send,        // (message)
+  list,        // ()
 
-  // Static utilities
+  initialize,  // ()          --> se puede llamar sólo 1 vez, tras limpiar el servidor
+
+  // Utilidades varias que no forman parte de la API
   Util,
 };
