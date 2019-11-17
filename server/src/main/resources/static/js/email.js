@@ -1,74 +1,64 @@
 import * as Gb from './gbapi.js'
 
-function createEmailItem(mensaje, index) {
+function createEmailItem(msg, index) {
     let fav = '';
-    if(mensaje.labels.includes("fav")) fav = ' font-weight-bold text-warning';
+    if(msg.labels.includes(Gb.MessageLabels.FAV)) fav = ' font-weight-bold text-warning';
     let read = 'bold';
-    if(mensaje.labels.includes("read")) read = 'light';
+    if(msg.labels.includes(Gb.MessageLabels.READ)) read = 'light';
     let html = '';
-    html += '<tr data-id=' + mensaje.msgid + '>' +
-            ' <td class="align-middle h3 email-fav-icon' + fav + '">☆</td>' +
-            ' <td class="font-weight-' + read + ' email-item">' +
-            '   <p class="h5">' + mensaje.from + '</p>' +
-            '   <p class="h7">' + mensaje.title + '</p>' +
-            ' </td>' +
-            ' <td class="align-middle">' +
+    html += '<li data-id=' + msg.msgid + ' class="row">' +
+            ' <div class="col-md-1 align-middle h3 email-fav-icon align-slef-center ' + fav + '">☆</div>' +
+            ' <div class="col-md-7 font-weight-' + read + ' email-item item">' +
+            '   <p class="h5">' + msg.from + '</p>' +
+            '   <p class="h7">' + msg.title + '</p>' +
+            ' </div>' +
+            ' <div class="col-md-3 email-item item align-self-center">' + msg.date + '</div>' +
+            ' <div class="col-md-1 align-middle align-self-center">' +
             '   <div class="form-check float-right">' +
-            '     <input class="form-check-input" type="checkbox" value="" id="defaultCheck' + index + '">' +
+            '     <input class="form-check-input" type="checkbox" value="" id="email-check-' + index + '">' +
             '   </div>' +
-            ' </td>' +
-            '</tr>';
+            ' </div>' +
+            '</li>' +
+            '<hr/>';
   
   
     return $(html);
 }
 
 function emailSetFav(elem){
-let msgid = $(elem).closest("tr").data("id");
-// Falta implementación API
+    let msgid = $(elem).closest("li").data("id");
+    let msg = Gb.resolve(msgid);
+    if(msg.labels.includes(Gb.MessageLabels.FAV)){
+        msg.labels.push(Gb.MessageLabels.FAV);
+        $(elem).addClass("font-weight-bold text-warning");
+    }
+    else{
+        let pos = msg.labels.indexOf(Gb.MessageLabels.FAV);
+        msg.labels.splice(pos, 1);
+        $(elem).removeClass("font-weight-bold text-warning");
+    }
 }
 
 function answerEmail(event){
-event.preventDefault();
-let toValue = $("#email-from").text();
-let fromValue = "yo";
-let title = $("#email-title").text();
-let body = $("#email-body").val();
-toValue = toValue.split(",");
-let msg = new Gb.Message(Gb.Util.randomText(), new Date(), fromValue, toValue, ["sent"], title, body);
-Gb.send(msg);
-alert("¡Mensaje enviado!");
-updateEmailList();
+    event.preventDefault();
+    let toValue = $("#email-from").text();
+    let fromValue = "yo";
+    let title = $("#email-title").text();
+    let body = $("#email-body").val();
+    toValue = toValue.split(",");
+    let msg = new Gb.Message(Gb.Util.randomText(), new Date(), fromValue, toValue, ["sent"], title, body);
+    Gb.send(msg);
+    alert("¡Mensaje enviado!");
+    updateEmailList();
 }
 
 function updateEmailList(){
-try {
-    // vaciamos un contenedor
-    $(".email-list tbody").empty();
-    // y lo volvemos a rellenar con su nuevo contenido
-    Gb.globalState.messages.forEach((m, index) =>  $(".email-list tbody").append(createEmailItem(m, index)));
-    
-    $(".email-fav-icon").on("click", function(){
-    emailSetFav($(this));
-    })
-    $(".email-item").on("click", function(){
-    let msgid = $(this).closest("tr").data("id");
-    $(".email-container").empty().append(receivedEmailFormView(Gb.globalState.messages.find(m => { 
-        if(m.msgid == msgid) return m; 
-    })));
-    $("#email-send").on("click", function(event){
-        answerEmail(event);
-    })
-    $("#email-cancel").on("click", function(event){
-        event.preventDefault();
-        if(confirm("¿Desea cancelar?"))
-        $(".email-container").empty();
-    })
-    })
-    // y asi para cada cosa que pueda haber cambiado
-} catch (e) {
-    console.log('Error actualizando', e);
-}
+    try {
+        $(".email-list ul").empty();
+        Gb.globalState.messages.forEach((m, index) =>  $(".email-list ul").append(createEmailItem(m, index)));
+    } catch (e) {
+        console.log('Error actualizando', e);
+    }
 }
 
 function resetEmailInputs(event) {
@@ -173,13 +163,12 @@ resetEmailInputs();
 }
 
 function deleteEmail(){
-    if($(".email-list table input[type='checkbox']:checked").length > 0){
+    if($(".email-list ul input[type='checkbox']:checked").length > 0){
         if(confirm("¿Seguro que desea borrar los mensajes?")){
-          $(".email-list table input[type='checkbox']:checked").each(function(index, element){
-            console.log($(element).closest("tr").data("id"));
-            Gb.rm($(element).closest("tr").data("id"));
+          $(".email-list ul input[type='checkbox']:checked").each(function(index, element){
+            console.log($(element).closest("li").data("id"));
+            Gb.rm($(element).closest("li").data("id")).then(updateEmailList());
           })
-          updateEmailList();
         }
       }
       else{
@@ -187,14 +176,46 @@ function deleteEmail(){
       }
 }
 
+function showEmailView(){
+    $(".main-view").empty().append(
+        $('<div class="email-list list container-fluid mt-2"></div>' +
+          '<div class="email-container"></div>'));
+    showList();
+}
+
+function showList(){
+    let html = '';
+    html += '<div class="row justify-content-between container-fluid">' +
+            '   <button class="btn btn-primary" id="email-new">Nuevo mensaje</button>' +
+            '   <button class="btn btn-danger" id="email-delete">Eliminar mensaje</button>' +
+            '</div>' +
+            '<div class="row container-fluid mt-2">' +
+            '   <input class="form-control" type="search" placeholder="Buscar" />' +
+            '</div>' +
+            '<ul class="container-fluid mt-2"></ul>' +
+            '<hr/>';
+    $(".main-view .email-list").append($(html));
+    updateEmailList();
+}
+
+function showReceivedEmail(elem){
+    let msgid = $(elem).data("id");
+    $(".email-container").empty().append(receivedEmailFormView(Gb.globalState.messages.find(m => { 
+        if(m.msgid == msgid) return m; 
+    })));
+}
+
+function showNewEmail(){
+    $(".main-view .email-container").empty().append(newEmailFormView());
+}
+
 export {
-    createEmailItem,
     emailSetFav,
     answerEmail,
-    updateEmailList,
     resetEmailInputs,
-    newEmailFormView,
-    receivedEmailFormView,
     sendNewEmail,
-    deleteEmail
+    deleteEmail,
+    showReceivedEmail,
+    showNewEmail,
+    showEmailView
 }

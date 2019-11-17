@@ -349,20 +349,16 @@ $(function() {
     email.deleteEmail();
   });
 
+  $(".main-view").on("click","span.email-fav-icon", function(){
+    email.emailSetFav($(this));
+  });
+
+  $(".main-view").on("click","div.email-item", function(){
+    email.showReceivedEmail($(this));
+  });
+
   $(".main-view").on("click","button#email-new", function(){
-
-    $(".email-container").empty().append(newEmailFormView());
-
-    $("#email-send").on("click", function(event){
-      sendNewEmail(event);
-    })
-
-    $("#email-cancel").on("click", function(event){
-      event.preventDefault();
-      if(confirm("¿Desea cancelar?"))
-        resetEmailInputs();
-    })
-
+    email.showNewEmail();
   });
 
   /*#####################
@@ -484,7 +480,7 @@ $(function() {
     Gb.login(user, password).then(d =>{
       if(d !== undefined){
         showSuperiorNavBar();
-        
+        email.showEmailView();
       }
       else{
         console.log("error");

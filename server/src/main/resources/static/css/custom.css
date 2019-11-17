@@ -1,14 +1,22 @@
-.msg {
-    font-size: 60%;
+hr{
+    margin-right:15px;
 }
 
-.email-list,
-.responsible-list{
+ul{
+    padding-inline-start: 0;
+    padding-left: 0 !important;
+}
+
+.list{
+    transition: width 0.5s;
+    float: left;
+}
+
+.list ul{
     max-height: calc(100vh - 204px);
 }
 
-.email-fav-icon,
-.email-item{
-    cursor: pointer;
+.list .item,
+.list .email-fav-icon{
+    cursor:pointer
 }
-
