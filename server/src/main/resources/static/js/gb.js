@@ -1,31 +1,10 @@
 import * as Gb from './gbapi.js'
 import * as email from './email.js'
-
-function generateLayout(){
-  $('section').empty();
-}
+import * as student from './student.js'
 
 function showSuperiorNavBar(){
   try {
-    $(".superior-nav").empty().append(createSuperiorNavBar( () => {
-
-      $('.nav-email').on('click', () => {
-      });
-
-      $('.nav-responsible').on('click', () => {
-      });
-
-      $('.nav-student').on('click', () => {
-      });
-
-      $('.nav-teacher').on('click', () => {
-      });
-
-      $('.nav-class').on('click', () => {
-      });
-
-    }));
-
+    $(".superior-nav").empty().append( createSuperiorNavBar() );
   } catch (e){
     console.log('Error actualizando', e);
   }
@@ -332,6 +311,31 @@ $(function() {
 
   // muestra un mensaje de bienvenida
   console.log("online!", Gb.globalState);
+
+  /*#####################
+   # NAVBAR
+   #####################*/
+  $('.navbar').on('click', '.nav-email', e => {
+    email.showEmailView(e);
+    console.log("Hola email");
+  });
+
+  $('.navbar').on("click",'.nav-responsible', e => {
+    console.log("Hola responsible");
+  });
+
+  $('.navbar').on('click','.nav-student', e => {
+    student.showStudentView(e);
+    console.log("Hola student");
+  });
+
+  $('.navbar').on('click','.nav-teacher', e => {
+    console.log("Hola teacher");
+  });
+
+  $('.navbar').on('click','.nav-class', e => {
+    console.log("Hola class");
+  });
 
   /*#####################
   # Email

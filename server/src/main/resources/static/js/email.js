@@ -7,21 +7,21 @@ function createEmailItem(msg, index) {
     if(msg.labels.includes(Gb.MessageLabels.READ)) read = 'light';
     let html = '';
     html += '<li data-id=' + msg.msgid + ' class="row">' +
-            ' <div class="col-md-1 align-middle h3 email-fav-icon align-slef-center ' + fav + '">☆</div>' +
-            ' <div class="col-md-7 font-weight-' + read + ' email-item item">' +
-            '   <p class="h5">' + msg.from + '</p>' +
-            '   <p class="h7">' + msg.title + '</p>' +
-            ' </div>' +
-            ' <div class="col-md-3 email-item item align-self-center">' + msg.date + '</div>' +
-            ' <div class="col-md-1 align-middle align-self-center">' +
-            '   <div class="form-check float-right">' +
-            '     <input class="form-check-input" type="checkbox" value="" id="email-check-' + index + '">' +
-            '   </div>' +
-            ' </div>' +
-            '</li>' +
-            '<hr/>';
-  
-  
+        ' <div class="col-md-1 align-middle h3 email-fav-icon align-slef-center ' + fav + '">☆</div>' +
+        ' <div class="col-md-7 font-weight-' + read + ' email-item item">' +
+        '   <p class="h5">' + msg.from + '</p>' +
+        '   <p class="h7">' + msg.title + '</p>' +
+        ' </div>' +
+        ' <div class="col-md-3 email-item item align-self-center">' + msg.date + '</div>' +
+        ' <div class="col-md-1 align-middle align-self-center">' +
+        '   <div class="form-check float-right">' +
+        '     <input class="form-check-input" type="checkbox" value="" id="email-check-' + index + '">' +
+        '   </div>' +
+        ' </div>' +
+        '</li>' +
+        '<hr/>';
+
+
     return $(html);
 }
 
@@ -114,8 +114,8 @@ function newEmailFormView(){
 }
 
 function receivedEmailFormView(mensaje){
-let html = '';
-html += '<form>' +
+    let html = '';
+    html += '<form>' +
         ' <div class="form-group row">' +
         '   <label for="formGroupExampleInput" class="col-sm-2 col-form-label">Emisor:</label>' +
         '   <div class="col-sm-10 my-auto">' +
@@ -150,7 +150,7 @@ html += '<form>' +
         ' </div>' +
         '</form>';
 
-return $(html);
+    return $(html);
 }
 
 function sendNewEmail(event, user) {
@@ -171,43 +171,43 @@ function sendNewEmail(event, user) {
 function deleteEmail(){
     if($(".email-list ul input[type='checkbox']:checked").length > 0){
         if(confirm("¿Seguro que desea borrar los mensajes?")){
-          $(".email-list ul input[type='checkbox']:checked").each(function(index, element){
-            console.log($(element).closest("li").data("id"));
-            Gb.rm($(element).closest("li").data("id")).then(updateEmailList());
-          })
+            $(".email-list ul input[type='checkbox']:checked").each(function(index, element){
+                console.log($(element).closest("li").data("id"));
+                Gb.rm($(element).closest("li").data("id")).then(updateEmailList());
+            })
         }
-      }
-      else{
+    }
+    else{
         alert("Selecciona al menos un mensaje");
-      }
+    }
 }
 
 function showEmailView(){
     $(".main-view").empty().append(
         $('<div class="email-list list container-fluid mt-2"></div>' +
-          '<div class="email-container form-container mt-2"></div>'));
+            '<div class="email-container form-container mt-2"></div>'));
     showList();
 }
 
 function showList(){
     let html = '';
     html += '<div class="row justify-content-between container-fluid">' +
-            '   <button class="btn btn-primary" id="email-new">Nuevo mensaje</button>' +
-            '   <button class="btn btn-danger" id="email-delete">Eliminar mensaje</button>' +
-            '</div>' +
-            '<div class="row container-fluid mt-2">' +
-            '   <input class="form-control" type="search" placeholder="Buscar" />' +
-            '</div>' +
-            '<ul class="container-fluid mt-2"></ul>' +
-            '<hr/>';
+        '   <button class="btn btn-primary" id="email-new">Nuevo mensaje</button>' +
+        '   <button class="btn btn-danger" id="email-delete">Eliminar mensaje</button>' +
+        '</div>' +
+        '<div class="row container-fluid mt-2">' +
+        '   <input class="form-control" type="search" placeholder="Buscar" />' +
+        '</div>' +
+        '<ul class="container-fluid mt-2"></ul>' +
+        '<hr/>';
     $(".main-view .email-list").append($(html));
     updateEmailList();
 }
 
 function showReceivedEmail(elem){
     let msgid = $(elem).data("id");
-    $(".email-container").empty().append(receivedEmailFormView(Gb.globalState.messages.find(m => { 
-        if(m.msgid == msgid) return m; 
+    $(".email-container").empty().append(receivedEmailFormView(Gb.globalState.messages.find(m => {
+        if(m.msgid == msgid) return m;
     })));
 }
 

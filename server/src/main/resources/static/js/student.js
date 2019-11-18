@@ -1,14 +1,141 @@
 import * as Gb from './gbapi.js'
 
-console.log(Gb.globalState);
+function showStudentView(){
+    $(".main-view").empty().append(
+        $(`<div class="student-list list container-fluid mt-2"></div><div class="student-container form-container mt-2"></div>`));
+    showList();
+}
 
-// Student
-function createStudentItem(s){
-    let html = `<tr>
-                  <td><div id="${s.sid}" class="student-index" >${s.first_name} ${s.last_name} ( Class: ${s.cid} )</div></td>
-              </tr>`;
+function showList(){
+    let html = `<div class="row justify-content-between container-fluid">
+                    <button class="btn btn-primary" id="student-new">Nuevo Alumno</button>
+                    <button class="btn btn-danger" id="student-delete">Eliminar Alumno</button>
+                </div>
+                <div class="row input-group container-fluid mt-2">
+                    <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-search-students btn-outline-secondary" type="button">Buscar</button>
+                    </div>
+                </div>
+                <ul class="container-fluid mt-2 list-group-flush list-group"></ul>
+                <hr/>`;
+    $(".main-view .student-list").append($(html));
+
+    updateStudentList();
+}
+
+function updateStudentList(){
+    try {
+        let studentList = $(".student-list ul");
+        studentList.empty();
+        Gb.globalState.students.forEach( (s, index) =>  studentList.append( createStudentItem(s, index) ) );
+    } catch (e) {
+        console.log('Error actualizando', e);
+    }
+
+    $('.student-li').on('click', function(){
+
+        let sid = $(this).data('sid'),
+            firstName = $(this).data('firstName'),
+            lastName = $(this).data('lastName'),
+            cid = $(this).data('cid');
+
+        let editForm = `<form class="student-edit-form">
+                            <div class="form-group row">
+                              <label for="sid" class="col-sm-2 col-form-label">DNI:</label>
+                              <div class="col-sm-10">
+                                <input type="text" class="form-control" id="sid" placeholder="DNI">
+                              </div>
+                            </div>
+                            <div class="form-group row">
+                               <label for="firstName" class="col-sm-2 col-form-label">Nombre:</label>
+                               <div class="col-sm-10">
+                                 <input type="text" class="form-control" id="firstName" placeholder="Nombre">
+                               </div>
+                             </div>
+                             <div class="form-group row">
+                               <label for="lastName" class="col-sm-2 col-form-label">Apellido:</label>
+                               <div class="col-sm-10">
+                                 <input type="text" class="form-control" id="lastName" placeholder="Apellido">
+                               </div>
+                             </div>
+                             <div class="form-group row">
+                               <label for="cid" class="col-sm-2 col-form-label">Clase:</label>
+                               <div class="col-sm-10">
+                                 <input type="text" class="form-control" id="cid" placeholder="ID Clase">
+                               </div>
+                             </div>
+                             <div class="form-row  justify-content-between" style="margin-top: 20px">
+                               <div class="">
+                                 <button class="btn btn-danger" id="student-edit" type="submit">Eliminar</button>
+                               </div>
+                               <div class="">
+                                 <button class="btn btn-warning" id="student-delete" type="submit">Editar</button>
+                               </div>
+                             </div>
+                        </form>`;
+
+        $('.student-list').addClass('col-md-3');
+        $('.main-view .student-container').empty().append(editForm);
+    });
+}
+
+function createStudentItem(s, index){
+
+    let html = `<li data-index="${index}" data-sid="${s.sid}" data-firstName="${s.firstName}" data-lastName="${s.lastName}" data-class="${s.cid}" class="row student-li list-group-item">
+                  <div class="student-index" >${s.firstName} ${s.lastName} ( Class: ${s.cid} )</div>
+                </li>`;
+
     $(".student-list").append(html);
 }
+
+function showNewStudent(){
+    if(!$('.student-list').hasClass('col-md-3')){
+        $('.student-list').addClass('col-md-3');
+    }
+
+    let newForm = `<form class="student-edit-form">
+                            <div class="form-group row">
+                              <label for="sid" class="col-sm-2 col-form-label">DNI:</label>
+                              <div class="col-sm-10">
+                                <input type="text" class="form-control" id="sid" placeholder="DNI">
+                              </div>
+                            </div>
+                            <div class="form-group row">
+                               <label for="firstName" class="col-sm-2 col-form-label">Nombre:</label>
+                               <div class="col-sm-10">
+                                 <input type="text" class="form-control" id="firstName" placeholder="Nombre">
+                               </div>
+                             </div>
+                             <div class="form-group row">
+                               <label for="lastName" class="col-sm-2 col-form-label">Apellido:</label>
+                               <div class="col-sm-10">
+                                 <input type="text" class="form-control" id="lastName" placeholder="Apellido">
+                               </div>
+                             </div>
+                             <div class="form-group row">
+                               <label for="cid" class="col-sm-2 col-form-label">Clase:</label>
+                               <div class="col-sm-10">
+                                 <input type="text" class="form-control" id="cid" placeholder="ID Clase">
+                               </div>
+                             </div>
+                             <div class="form-row  justify-content-between" style="margin-top: 20px">
+                               <div class="">
+                                 <button class="btn btn-danger" id="student-edit" type="submit">Eliminar</button>
+                               </div>
+                               <div class="">
+                                 <button class="btn btn-warning" id="student-delete" type="submit">Editar</button>
+                               </div>
+                             </div>
+                        </form>`;
+
+    $('.main-view .student-container').empty().append(newForm);
+}
+
+export {
+    showStudentView
+}
+/**  OLD   **/
 
 function getStudentFromState(sid){
     let resp = undefined;
@@ -73,13 +200,6 @@ function repaintStudents() {
 
 }
 
-function dispatchStudentView(div){
-    let opts = $.find('.student-opt');
-    $.each(opts, function (index, opt) {
-        $(opt).hide();
-    });
-    $('.' + div).show();
-}
 
 
 /*#####################
