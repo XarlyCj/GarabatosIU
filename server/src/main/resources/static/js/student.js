@@ -6,6 +6,15 @@ function showStudentView(){
     showList();
 }
 
+function createStudentItem(s, index){
+
+    let html = `<li data-index="${index}" data-sid="${s.sid}" data-firstname="${s.firstName}" data-lastname="${s.lastName}" data-cid="${s.cid}" class="row student-li list-group-item">
+                  <div class="student-index" >${s.firstName} ${s.lastName} ( Class: ${s.cid} )</div>
+                </li>`;
+
+    $(".student-list").append(html);
+}
+
 function showList(){
     let html = `<div class="row justify-content-between container-fluid">
                     <button class="btn btn-primary" id="student-new">Nuevo Alumno</button>
@@ -125,15 +134,6 @@ function updateStudentList(){
     });
 }
 
-function createStudentItem(s, index){
-
-    let html = `<li data-index="${index}" data-sid="${s.sid}" data-firstname="${s.firstName}" data-lastname="${s.lastName}" data-cid="${s.cid}" class="row student-li list-group-item">
-                  <div class="student-index" >${s.firstName} ${s.lastName} ( Class: ${s.cid} )</div>
-                </li>`;
-
-    $(".student-list").append(html);
-}
-
 /* Handlers */
 $('#student-create').click( event => {
     event.preventDefault();
@@ -155,13 +155,13 @@ $('#student-create').click( event => {
 
 });
 
-$('#student-delete').on('click', function (event) {
+$('#student-delete').on('click', event => {
     event.preventDefault();
     let sid =  $('input[type=hidden]').val()
     Gb.rm(sid).then( updateStudentList() );
 });
 
-$('#student-edit').on('click', function (event) {
+$('#student-edit').on('click', event => {
     event.preventDefault();
     let sid         = $('input#sid').val();
     let first_name  = $('input#firstname').val();

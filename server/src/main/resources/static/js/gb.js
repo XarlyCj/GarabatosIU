@@ -336,7 +336,6 @@ $(function() {
   $('.navbar').on('click','.nav-class', e => {
     console.log("Hola class");
   });
-
   /*#####################
   # Email
   #####################*/
