@@ -10,6 +10,7 @@ ul{
 .list{
     transition: width 0.5s;
     float: left;
+    height: calc(100vh - 72px);
 }
 
 .list ul{
@@ -19,4 +20,8 @@ ul{
 .list .item,
 .list .email-fav-icon{
     cursor:pointer
+}
+
+.form-container{
+    display:grid;
 }

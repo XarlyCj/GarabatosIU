@@ -312,6 +312,53 @@ function populateJson(){
   );
 }
 
+// funcion para generar datos de ejemplo: clases, mensajes entre usuarios, ...
+// se puede no-usar, o modificar libremente
+async function populate(classes, minStudents, maxStudents, minParents, maxParents, msgCount) {
+  const U = Gb.Util;
+
+  // genera datos de ejemplo
+  let classIds = classes || ["1A", "1B"];
+  let minStudentsInClass = minStudents || 2;
+  let maxStudentsInClass = maxStudents || 5;
+  let minParentsPerStudent = minParents || 1;
+  let maxParentsPerStudent = maxParents || 3;
+  let userIds = [];
+  let tasks = [];
+
+  classIds.forEach(cid => {
+    tasks.push(() => Gb.addClass(new Gb.EClass(cid)));
+    let teacher = U.randomUser(Gb.UserRoles.TEACHER, [cid]);
+    userIds.push(teacher.uid);
+    tasks.push(() => Gb.addUser(teacher));
+
+    let students = U.fill(U.randomInRange(minStudentsInClass, maxStudentsInClass), () => U.randomStudent(cid));
+    students.forEach(s => {
+      tasks.push(() => Gb.addStudent(s));
+      let parents = U.fill(U.randomInRange(minParentsPerStudent, maxParentsPerStudent),
+        () => U.randomUser(Gb.UserRoles.GUARDIAN, [], [s.sid]));
+      parents.forEach( p => {
+        userIds.push(p.uid);
+        tasks.push(() =>  Gb.addUser(p));
+      });
+    });
+  });
+  tasks.push(() => Gb.addUser(U.randomUser(Gb.UserRoles.ADMIN)));
+  U.fill(msgCount, () => U.randomMessage(userIds)).forEach(m => tasks.push(() => Gb.send(m)));
+
+  // los procesa en secuencia contra un servidor
+  for (let t of tasks) {
+    try {
+        console.log("Starting a task ...");
+        await t().then(console.log("task finished!"));
+    } catch (e) {
+        console.log("ABORTED DUE TO ", e);
+    }
+  }
+}
+
+
+
 //
 //
 // Código de pegamento, ejecutado sólo una vez que la interfaz esté cargada.
@@ -323,22 +370,17 @@ $(function() {
   // expone Gb para que esté accesible desde la consola
   window.Gb = Gb;
   const U = Gb.Util;
-
+  let currentUser = "";
 
 
   // muestra un mensaje de bienvenida
   console.log("online!", Gb.globalState);
-  
-  if($(".email-view").length > 0){
-    console.log("update");
-    updateEmailList();
-  }
 
   /*#####################
   # Email
   #####################*/
   $(".main-view").on("click","button#email-send", function(event){
-    email.sendNewEmail();
+    email.sendNewEmail(event);
   });
 
   $(".main-view").on("click","button#email-cancel", function(event){
@@ -472,15 +514,18 @@ $(function() {
   # Login
   #####################*/
 
-  $(".main-view").on("click","button#login-submit", e=>{
+  $(".main-view").on("submit","form.login", e=>{
     e.preventDefault();
     let user = $("#login-user").val();
     let password = $("#login-password").val();
 
     Gb.login(user, password).then(d =>{
       if(d !== undefined){
-        showSuperiorNavBar();
-        email.showEmailView();
+        currentUser = user;
+        populate().then(()=>{
+          showSuperiorNavBar();
+          email.showEmailView();
+        })
       }
       else{
         console.log("error");
@@ -498,6 +543,7 @@ $(function() {
       Gb.logout().then(d =>{
         if(d !== undefined){
           showLoginForm();
+          currentUser = "";
         }
         else{
           console.log("error");

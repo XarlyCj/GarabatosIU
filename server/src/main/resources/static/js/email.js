@@ -62,11 +62,11 @@ function updateEmailList(){
 }
 
 function resetEmailInputs(event) {
-event.preventDefault();
-$("#email-to").val("");
-$("#email-cc").val("");
-$("#email-subject").val("");
-$("#email-body").val("");
+    if(event !== undefined) event.preventDefault();
+    $("#email-to").val("");
+    $("#email-cc").val("");
+    $("#email-subject").val("");
+    $("#email-body").val("");
 }
 
 function newEmailFormView(){
@@ -146,20 +146,20 @@ return $(html);
 }
 
 function sendNewEmail(event) {
-event.preventDefault();
-let toValue = $("#email-to").val();
-let ccValue = $("#email-cc").val();
-let fromValue = "yo";
-let title = $("#email-subject").val();
-let body = $("#email-body").val();
-ccValue = ccValue.split(",");
-toValue = toValue.split(",");
-toValue = toValue.concat(ccValue);
-let msg = new Gb.Message(Gb.Util.randomText(), new Date(), fromValue, toValue, ["sent"], title, body);
-Gb.send(msg);
-alert("¡Mensaje enviado!");
-updateEmailList();
-resetEmailInputs();
+    event.preventDefault();
+    let toValue = $("#email-to").val();
+    let ccValue = $("#email-cc").val();
+    let fromValue = "yo";
+    let title = $("#email-subject").val();
+    let body = $("#email-body").val();
+    ccValue = ccValue.split(",");
+    toValue = toValue.split(",");
+    toValue = toValue.concat(ccValue);
+    let msg = new Gb.Message(Gb.Util.randomText(), new Date(), fromValue, toValue, ["sent"], title, body);
+    Gb.send(msg);
+    alert("¡Mensaje enviado!");
+    updateEmailList();
+    resetEmailInputs();
 }
 
 function deleteEmail(){
@@ -179,7 +179,7 @@ function deleteEmail(){
 function showEmailView(){
     $(".main-view").empty().append(
         $('<div class="email-list list container-fluid mt-2"></div>' +
-          '<div class="email-container"></div>'));
+          '<div class="email-container form-container mt-2"></div>'));
     showList();
 }
 
@@ -206,6 +206,7 @@ function showReceivedEmail(elem){
 }
 
 function showNewEmail(){
+    if(!$(".email-list").hasClass("col-md-3")) $(".email-list").addClass("col-md-3");
     $(".main-view .email-container").empty().append(newEmailFormView());
 }
 
