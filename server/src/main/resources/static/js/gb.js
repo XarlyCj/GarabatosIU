@@ -242,7 +242,7 @@ function addLoader(elem){
 
 function removeLoader(elem){
   if($(elem).is(":disabled")){
-    $(elem).find("div.spinner-border").delete()
+    $(elem).find("div.spinner-border").remove()
     .prop("disabled", false);
   }
 }
