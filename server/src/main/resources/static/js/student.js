@@ -9,17 +9,59 @@ function showStudentView(){
 function showList(){
     let html = `<div class="row justify-content-between container-fluid">
                     <button class="btn btn-primary" id="student-new">Nuevo Alumno</button>
-                    <button class="btn btn-danger" id="student-delete">Eliminar Alumno</button>
+                    <button class="btn btn-danger" id="student-delete-massive">Eliminar Alumno</button>
                 </div>
                 <div class="row input-group container-fluid mt-2">
-                    <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Buscar Alumno" aria-describedby="basic-addon2">
+                    <input type="text" class="form-control" placeholder="Buscar Alumno" aria-label="Buscar Alumno" aria-describedby="basic-addon2">
                     <div class="input-group-append">
                         <button class="btn btn-search-students btn-outline-secondary" type="button">Buscar</button>
                     </div>
                 </div>
                 <ul class="container-fluid mt-2 list-group-flush list-group"></ul>
                 <hr/>`;
+
     $(".main-view .student-list").append($(html));
+
+    $('#student-new').on('click', function (event) {
+
+        if(!$('.student-list').hasClass('col-md-3')){
+            $('.student-list').addClass('col-md-3');
+        }
+
+        let newForm = `<div style='padding: 89px;'><form class='student-create-form'>
+                            <div class='form-group row'>
+                              <label for='sid' class='col-sm-2 col-form-label'>DNI:</label>
+                              <div class='col-sm-10'>
+                                <input type='text' class='form-control' id='sid' placeholder='DNI'>
+                              </div>
+                            </div>
+                            <div class='form-group row'>
+                               <label for='firstName' class='col-sm-2 col-form-label'>Nombre:</label>
+                               <div class='col-sm-10'>
+                                 <input type='text' class='form-control' id='firstName' placeholder='Nombre'>
+                               </div>
+                             </div>
+                             <div class='form-group row'>
+                               <label for='lastName' class='col-sm-2 col-form-label'>Apellido:</label>
+                               <div class='col-sm-10'>
+                                 <input type='text' class='form-control' id='lastName' placeholder='Apellido'>
+                               </div>
+                             </div>
+                             <div class='form-group row'>
+                               <label for='cid' class='col-sm-2 col-form-label'>Clase:</label>
+                               <div class='col-sm-10'>
+                                 <input type='text' class='form-control' id='cid' placeholder='ID Clase'>
+                               </div>
+                             </div>
+                             <div class='form-row  justify-content-between' style='margin-top: 20px'>
+                               <div class=''>
+                                 <button class='btn btn-warning' id='student-create' >Crear</button>
+                               </div>
+                             </div>
+                        </form></div>`;
+
+        $('.main-view .student-container').empty().append(newForm);
+    });
 
     updateStudentList();
 }
@@ -92,47 +134,8 @@ function createStudentItem(s, index){
     $(".student-list").append(html);
 }
 
-function showNewStudent(){
-    if(!$('.student-list').hasClass('col-md-3')){
-        $('.student-list').addClass('col-md-3');
-    }
-
-    let newForm = `<div style="padding: 89px;"><form class="student-create-form">
-                            <div class="form-group row">
-                              <label for="sid" class="col-sm-2 col-form-label">DNI:</label>
-                              <div class="col-sm-10">
-                                <input type="text" class="form-control" id="sid" placeholder="DNI">
-                              </div>
-                            </div>
-                            <div class="form-group row">
-                               <label for="firstName" class="col-sm-2 col-form-label">Nombre:</label>
-                               <div class="col-sm-10">
-                                 <input type="text" class="form-control" id="firstName" placeholder="Nombre">
-                               </div>
-                             </div>
-                             <div class="form-group row">
-                               <label for="lastName" class="col-sm-2 col-form-label">Apellido:</label>
-                               <div class="col-sm-10">
-                                 <input type="text" class="form-control" id="lastName" placeholder="Apellido">
-                               </div>
-                             </div>
-                             <div class="form-group row">
-                               <label for="cid" class="col-sm-2 col-form-label">Clase:</label>
-                               <div class="col-sm-10">
-                                 <input type="text" class="form-control" id="cid" placeholder="ID Clase">
-                               </div>
-                             </div>
-                             <div class="form-row  justify-content-between" style="margin-top: 20px">
-                               <div class="">
-                                 <button class="btn btn-warning" id="student-create" type="submit">Crear</button>
-                               </div>
-                             </div>
-                        </form></div>`;
-
-    $('.main-view .student-container').empty().append(newForm);
-}
-
-$("#student-create").on("click", function (event) {
+/* Handlers */
+$('#student-create').click( event => {
     event.preventDefault();
     let param = {},
         inputs = $('.student-create-form .form-control');
@@ -143,10 +146,9 @@ $("#student-create").on("click", function (event) {
     });
 
     let s = new Gb.Student(param.sid, param.first_name, param.last_name, param.cid, [] );
-
     try {
         Gb.addStudent(s).then( updateStudentList() );
-        alert('El alumno se hacreado con exito');
+        alert('El alumno se ha creado con exito');
     } catch (e) {
         alert('Alumno ya existe con ese ID');
     }
