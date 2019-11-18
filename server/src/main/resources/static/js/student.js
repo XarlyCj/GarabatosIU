@@ -1,12 +1,46 @@
 import * as Gb from './gbapi.js'
 
-console.log(Gb.globalState);
+function showStudentView(){
+    $(".main-view").empty().append(
+        $(`<div class="student-list list container-fluid mt-2"></div><div class="student-container form-container mt-2"></div>`));
+    showList();
+}
 
-// Student
+function showList(){
+    let html = `<div class="row justify-content-between container-fluid">
+                    <button class="btn btn-primary" id="student-new">Nuevo Alumno</button>
+                    <button class="btn btn-danger" id="student-delete">Eliminar Alumno</button>
+                </div>
+                <div class="row container-fluid mt-2">' +
+                    <input class="form-control" type="search" placeholder="Buscar" />
+                </div>
+                <ul class="container-fluid mt-2"></ul>
+                <hr/>`;
+    $(".main-view .student-list").append($(html));
+    updateStudentList();
+}
+
+function updateStudentList(){
+    try {
+        let studentList = $(".student-list ul");
+        studentList.empty();
+        Gb.globalState.students.forEach( (m, index) =>  studentList.append( createStudentItem(m) ) );
+    } catch (e) {
+        console.log('Error actualizando', e);
+    }
+}
+
+export {
+    showStudentView
+}
+
+/**  OLD   **/
 function createStudentItem(s){
-    let html = `<tr>
-                  <td><div id="${s.sid}" class="student-index" >${s.first_name} ${s.last_name} ( Class: ${s.cid} )</div></td>
-              </tr>`;
+
+    let html = `<li data-id="${s.sid}" class="row">
+                  <div id="${s.sid}" class="student-index" >${s.firstName} ${s.lastName} ( Class: ${s.cid} )</div>
+                </li>`;
+
     $(".student-list").append(html);
 }
 
