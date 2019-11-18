@@ -234,6 +234,20 @@ function populateJson(){
   );
 }
 
+function addLoader(elem){
+  console.log("elem", elem);
+  $(elem).append($('<div class="spinner-border ml-1 spinner-border-sm" role="status" aria-hidden="true"></div>'))
+  .prop("disabled", true);
+}
+
+function removeLoader(elem){
+  if($(elem).is(":disabled")){
+    $(elem).find("div.spinner-border").remove()
+    .prop("disabled", false);
+  }
+}
+  
+
 // funcion para generar datos de ejemplo: clases, mensajes entre usuarios, ...
 // se puede no-usar, o modificar libremente
 async function populate(classes, minStudents, maxStudents, minParents, maxParents, msgCount) {
@@ -327,7 +341,7 @@ $(function() {
   # Email
   #####################*/
   $(".main-view").on("click","button#email-send", function(event){
-    email.sendNewEmail(event);
+    email.sendNewEmail(event, currentUser);
   });
 
   $(".main-view").on("click","button#email-cancel", function(event){
@@ -397,13 +411,15 @@ $(function() {
     e.preventDefault();
     let user = $("#login-user").val();
     let password = $("#login-password").val();
-
+    let elem = $(this).find("button#login-submit");
+    addLoader(elem);
     Gb.login(user, password).then(d =>{
       if(d !== undefined){
         currentUser = user;
         populate().then(()=>{
           showSuperiorNavBar();
           email.showEmailView();
+          removeLoader(elem);
         })
       }
       else{

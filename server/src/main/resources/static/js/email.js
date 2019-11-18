@@ -72,36 +72,44 @@ function resetEmailInputs(event) {
 function newEmailFormView(){
     let html = '';
     html += '<form class="email-new-form">' +
-        ' <div class="form-group row">' +
-        '   <label for="email-to" class="col-sm-2 col-form-label">Para:</label>' +
-        '   <div class="col-sm-10">' +
-        '     <input type="text" class="form-control" id="email-to" placeholder="Destinatarios">' +
-        '   </div>' +
-        ' </div>' +
-        ' <div class="form-group row">' +
-        '    <label for="email-cc" class="col-sm-2 col-form-label">CC:</label>' +
-        '    <div class="col-sm-10">' +
-        '      <input type="text" class="form-control" id="email-cc" placeholder="Copia">' +
-        '    </div>' +
-        '  </div>' +
-        '  <div class="form-group row">' +
-        '    <label for="email-subject" class="col-sm-2 col-form-label">Asunto:</label>' +
-        '    <div class="col-sm-10">' +
-        '      <input type="text" class="form-control" id="email-subject" placeholder="Introduzca Asunto">' +
-        '    </div>' +
-        '  </div>' +
-        '  <div class="form-group">' +
-        '    <textarea id="email-body" class="form-control" style="height:400px;"></textarea>' +
-        '  </div>' +
-        '  <div class="form-row  justify-content-between" style="margin-top: 20px">' +
-        '    <div class="">' +
-        '      <button class="btn btn-danger" id="email-cancel" type="submit">Cancelar</button>' +
-        '    </div>' +
-        '    <div class="">' +
-        '      <button class="btn btn-success" id="email-send" type="submit">Enviar</button>' +
-        '    </div>' +
-        '  </div>' +
-        '</form>'
+            ' <div class="form-group row">' +
+            '   <label for="email-to" class="col-sm-2 col-form-label">Para:</label>' +
+            '   <div class="col-sm-10">' +
+            '     <select class="selectpicker" multiple data-live-search="true" id="email-to" data-width="100%">';
+    Gb.globalState.users.forEach(u=>{
+        html += '   <option value="' + u.uid + '">'+ u.first_name + " " + u.last_name  +'</option>'
+    });
+    html += '     </select>' + 
+            '   </div>' +
+            ' </div>' +
+            ' <div class="form-group row">' +
+            '    <label for="email-cc" class="col-sm-2 col-form-label">CC:</label>' +
+            '    <div class="col-sm-10">' +
+            '      <select class="selectpicker" multiple data-live-search="true" id="email-cc" data-width="100%">';
+    Gb.globalState.users.forEach(u=>{
+        html += '   <option value="' + u.uid + '">'+ u.first_name + " " + u.last_name  +'</option>'
+    });
+    html += '     </select>' +
+            '    </div>' +
+            '  </div>' +
+            '  <div class="form-group row">' +
+            '    <label for="email-subject" class="col-sm-2 col-form-label">Asunto:</label>' +
+            '    <div class="col-sm-10">' +
+            '      <input type="text" class="form-control" id="email-subject" placeholder="Introduzca Asunto">' +
+            '    </div>' +
+            '  </div>' +
+            '  <div class="form-group">' +
+            '    <textarea id="email-body" class="form-control" style="height:400px;"></textarea>' +
+            '  </div>' +
+            '  <div class="form-row  justify-content-between" style="margin-top: 20px">' +
+            '    <div class="">' +
+            '      <button class="btn btn-danger" id="email-cancel" type="submit">Cancelar</button>' +
+            '    </div>' +
+            '    <div class="">' +
+            '      <button class="btn btn-success" id="email-send" type="submit">Enviar</button>' +
+            '    </div>' +
+            '  </div>' +
+            '</form>'
     return $(html);
 }
 
@@ -145,15 +153,13 @@ function receivedEmailFormView(mensaje){
     return $(html);
 }
 
-function sendNewEmail(event) {
+function sendNewEmail(event, user) {
     event.preventDefault();
     let toValue = $("#email-to").val();
     let ccValue = $("#email-cc").val();
-    let fromValue = "yo";
+    let fromValue = user;
     let title = $("#email-subject").val();
     let body = $("#email-body").val();
-    ccValue = ccValue.split(",");
-    toValue = toValue.split(",");
     toValue = toValue.concat(ccValue);
     let msg = new Gb.Message(Gb.Util.randomText(), new Date(), fromValue, toValue, ["sent"], title, body);
     Gb.send(msg);
@@ -208,6 +214,7 @@ function showReceivedEmail(elem){
 function showNewEmail(){
     if(!$(".email-list").hasClass("col-md-3")) $(".email-list").addClass("col-md-3");
     $(".main-view .email-container").empty().append(newEmailFormView());
+    $('select').selectpicker();
 }
 
 export {
