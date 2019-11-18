@@ -62,11 +62,11 @@ function updateEmailList(){
 }
 
 function resetEmailInputs(event) {
-event.preventDefault();
-$("#email-to").val("");
-$("#email-cc").val("");
-$("#email-subject").val("");
-$("#email-body").val("");
+    event.preventDefault();
+    $("#email-to").val("");
+    $("#email-cc").val("");
+    $("#email-subject").val("");
+    $("#email-body").val("");
 }
 
 function newEmailFormView(){
