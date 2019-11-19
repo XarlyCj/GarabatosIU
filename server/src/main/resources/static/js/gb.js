@@ -251,7 +251,7 @@ $(function() {
     addLoader(elem);
     Gb.login(user, password).then(d =>{
       if(d !== undefined){
-          if(Gb.classes.length == 0) {
+          if(Gb.globalState.classes.length == 0) {
             populate(["1A", "1B"], 2, 4, 1, 3, 0).then(()=>{
               showSuperiorNavBar();
               email.showEmailView();
@@ -266,10 +266,12 @@ $(function() {
         console.log("error");
         removeLoader(elem);
       }
-    }).catch(e=>{
+    })
+    
+    /*.catch(e=>{
       removeLoader(elem);
-      $(".main-view").append($("<p class='text-danger'>Datos de acceso incorrectos</p>"));
-    });
+      $(".main-view").append($("<p class='text-danger justify-content-center d-flex'>Datos de acceso incorrectos</p>"));
+    });*/
   });
 
   /*#####################
