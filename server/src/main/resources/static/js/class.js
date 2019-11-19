@@ -2,11 +2,11 @@ import * as Gb from './gbapi.js'
 
 function showClassesView(){
     $(".main-view").empty().append(
-        $(`<div class="Classes-list list container-fluid mt-2"></div><div class="classes-container form-container mt-2"></div>`));
+        $(`<div class="classes-list list container-fluid mt-2"></div><div class="classes-container form-container mt-2"></div>`));
     showList();
 }
 
-function createClassItem(c){
+function createClassItem(c, index){
 
     let html = `<li  data-cid="${c.cid}" data-Name="${c.cid}" class="row classes-li list-group-item">
                   <div class="classes-index" >${c.cid}</div>
@@ -17,7 +17,7 @@ function createClassItem(c){
 
 function showList(){
     let html = `<div class="row justify-content-between container-fluid">
-                    <button class="btn btn-primary" id="classes-new">Nuevo Clase</button>
+                    <button class="btn btn-primary" id="classes-new">Nueva Clase</button>
                     <button class="btn btn-danger" id="classes-delete-massive">Eliminar Clase</button>
                 </div>
                 <div class="row input-group container-fluid mt-2">
@@ -107,7 +107,7 @@ function updateClassesList(classes){
                                   </div>
                                 </div>
                                 ${
-                                    teaches.forEach(p=> {
+                                    teachers.forEach(p=> {
                                         `
                                 <div class="form-group row">
                                 <label for="teachers" class="col-sm-2 col-form-label">Profesores:</label>
