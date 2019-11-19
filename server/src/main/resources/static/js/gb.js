@@ -317,6 +317,21 @@ $(function() {
   });
 
   /*#####################
+  # Classes
+  #####################*/
+  
+  $(".main-view").on("submit", "form.classes-create-form", e=>{
+    clases.createClasses(e);
+  });
+
+  $(".main-view").on("click", "button#classes-delete", e=>{
+    clases.deleteClasses(e);
+  });
+
+  $(".main-view").on("submit", "form.classes-edit-form", e=>{
+    clases.editClasses(e);
+  });
+  /*#####################
   # Login
   #####################*/
 
