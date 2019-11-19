@@ -340,14 +340,8 @@ $(function() {
     e.preventDefault();
     if(confirm("¿Quieres cerrar la sesión?")){
       try{
-        Gb.logout().then(d =>{
-          if(d !== undefined){
-            showLoginForm();
-          }
-          else{
-            console.log("error");
-          }
-        })
+        Gb.logout();
+        showLoginForm();
       }catch(e){
         console.log("error", e);
       }

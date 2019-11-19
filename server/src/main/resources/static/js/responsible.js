@@ -137,10 +137,10 @@ function updateresponsibleList(){
                                  </div>
                                  <div class="form-row  justify-content-between" style="margin-top: 20px">
                                    <div class="">
-                                     <button class="btn btn-danger" id="responsible-edit" type="submit">Eliminar</button>
+                                     <button class="btn btn-danger" id="responsible-delete" type="submit">Eliminar</button>
                                    </div>
                                    <div class="">
-                                     <button class="btn btn-warning" id="responsible-delete" type="submit">Editar</button>
+                                     <button class="btn btn-warning" id="responsible-edit" type="submit">Editar</button>
                                    </div>
                                  </div>
                             </form>
