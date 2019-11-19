@@ -1,6 +1,10 @@
 import * as Gb from './gbapi.js'
 import * as email from './email.js'
 import * as student from './student.js'
+import * as teacher from './teachers.js'
+import * as responsible from './responsible.js'
+
+
 
 function showSuperiorNavBar(){
   try {
@@ -69,139 +73,6 @@ function loginForm(){
 
   return $(html);
 }
-
-function updateResponsibleList(){
-  try {
-    // vaciamos un contenedor
-    $(".responsible-list tbody").empty();
-    // y lo volvemos a rellenar con su nuevo contenido
-    Gb.globalState.users.forEach((u, index) =>  {
-      if(u.type == "guardian")
-        $(".responsible-list tbody").append(createResponsibleItem(u, index));
-    });
-    
-    $(".responsible-item").on("click", function(){
-      let uid = $(this).closest("tr").data("id");
-      $(".responsible-container").empty().append(editResponsibleFormView(Gb.globalState.users.find(u => { 
-        if(u.uid == uid) return u; 
-      })));
-      $("#responsible-edit-save").on("click", function(event){
-        editResponsible(event);
-      })
-      $("#responsible-edit-cancel").on("click", function(event){
-        event.preventDefault();
-        if(confirm("¿Desea cancelar?"))
-          $(".responsible-container").empty();
-      })
-    })
-    // y asi para cada cosa que pueda haber cambiado
-  } catch (e) {
-    console.log('Error actualizando', e);
-  }
-}
-
-function createResponsibleItem(user, index) {
-  let html = '';
-  html += '<tr data-id=' + user.uid + '>' +
-          ' <td colspan="2" class="h5 responsible-item">' +
-          user.last_name + ', ' + user.first_name + 
-          ' </td>' +
-          ' <td class="align-middle">' +
-          '   <div class="form-check float-right">' +
-          '     <input class="form-check-input" type="checkbox" value="" id="defaultCheck' + index + '">' +
-          '   </div>' +
-          ' </td>' +
-          '</tr>';
-
-  return $(html);
-}
-
-function newResponsibleFormView(){
-  let html = '';
-  html += '<form class="responsible-new-form">' +
-          ' <div class="form-group">' +
-          '   <label for="responsible-first_name">Nombre:</label>' +
-          '   <input type="text" class="form-control" id="responsible-first_name" placeholder="Nombre">' +
-          ' </div>' +
-          ' <div class="form-group">' +
-          '    <label for="responsible-last_name">Apellidos:</label>' +
-          '    <input type="text" class="form-control" id="responsible-last_name" placeholder="Apellidos">' +
-          '  </div>' +
-          '  <div class="form-group">' +
-          '    <label for="responsible-phone">Teléfono:</label>' +
-          '    <input type="text" class="form-control" id="responsible-phone" placeholder="Teléfono">' +
-          '  </div>' +
-          '  <div class="form-group">' +
-          '    <label for="responsible-students">Alumnos:</label>' +
-          '    <input type="text" class="form-control" id="responsible-students" placeholder="Nombre y apellidos de cada alumno">' +
-          '    <small class="text-muted">En caso de ser mas de uno insertalos mediante comas.</small>' +
-          '  </div>' +
-          '  <div class="form-row  justify-content-between" style="margin-top: 20px">' +
-          '    <div class="">' +
-          '      <button class="btn btn-danger" id="responsible-new-cancel" type="submit">Cancelar</button>' +
-          '    </div>' +
-          '    <div class="">' +
-          '      <button class="btn btn-success" id="responsible-new-save" type="submit">Enviar</button>' +
-          '    </div>' +
-          '  </div>' +
-          '</form>'
-  return $(html);
-}
-
-function editResponsibleFormView(user){
-  let html = '';
-  html += '<form class="responsible-new-form">' +
-          ' <div class="form-group">' +
-          '   <label for="responsible-first_name">Nombre:</label>' +
-          '   <input type="text" class="form-control" id="responsible-first_name" value="' + user.first_name + '" placeholder="Nombre">' +
-          ' </div>' +
-          ' <div class="form-group">' +
-          '    <label for="responsible-last_name">Apellidos:</label>' +
-          '    <input type="text" class="form-control" value="' + user.last_name + '" id="responsible-last_name" placeholder="Apellidos">' +
-          '  </div>' +
-          '  <div class="form-group">' +
-          '    <label for="responsible-phone">Teléfono:</label>' +
-          '    <input type="text" class="form-control" value="' + user.tels + '" id="responsible-phone" placeholder="Teléfono">' +
-          '  </div>' +
-          '  <div class="form-group">' +
-          '    <label for="responsible-students">Alumnos:</label>' +
-          '    <input type="text" class="form-control" value="' + user.students.join(",") + '(Hay que implementar una función para recorrer los array y montar nombres y apellidos)' + '" id="responsible-students" placeholder="Nombre y apellidos de cada alumno">' +
-          '    <small class="text-muted">En caso de ser mas de uno insertalos mediante comas.</small>' +
-          '  </div>' +
-          '  <div class="form-row  justify-content-between" style="margin-top: 20px">' +
-          '    <div class="">' +
-          '      <button class="btn btn-danger" id="responsible-edit-cancel" type="submit">Cancelar</button>' +
-          '    </div>' +
-          '    <div class="">' +
-          '      <button class="btn btn-success" id="responsible-edit-save" type="submit">Enviar</button>' +
-          '    </div>' +
-          '  </div>' +
-          '</form>'
-  return $(html);
-}
-
-function createResponsible(event) {
-  event.preventDefault();
-  let first_name = $("#responsible-first_name").val();
-  let last_name = $("#responsible-last_name").val();
-  let phone = $("#responsible-phone").val();
-  let students = $("#responsible-students").val();
-  students = students.split(",");
-  // Implementar función que busque los ids por nombre y devuelva un array
-  let user = new Gb.User(Gb.Util.randomText(), "guardian", first_name, last_name, phone, null, students);
-  Gb.addUser(user);
-  alert("Responsable creado!");
-  updateResponsibleList();
-  resetResponsibleInputs();
-}
-
-function resetResponsibleInputs() {
-  $("#responsible-first_name").val("");
-  $("#responsible-last_name").val("");
-  $("#responsible-phone").val("");
-  $("#responsible-students").val("");
-}
-
 function populateJson(){
   // genera datos de ejemplo
   let classIds = ["1A", "1B", "2A", "2B", "3A", "3B"];
@@ -306,7 +177,6 @@ $(function() {
   // expone Gb para que esté accesible desde la consola
   window.Gb = Gb;
   const U = Gb.Util;
-  let currentUser = "";
 
 
   // muestra un mensaje de bienvenida
@@ -315,43 +185,49 @@ $(function() {
   /*#####################
    # NAVBAR
    #####################*/
-  $('.navbar').on('click', '.nav-email', e => {
+  $('.superior-nav').on('click', '.nav-email', e => {
     email.showEmailView(e);
     console.log("Hola email");
   });
 
-  $('.navbar').on("click",'.nav-responsible', e => {
+  $('.superior-nav').on("click",'.nav-responsible', e => {
+    responsible.showResponsibleView(e);
     console.log("Hola responsible");
   });
 
-  $('.navbar').on('click','.nav-student', e => {
+  $('.superior-nav').on('click','.nav-student', e => {
     student.showStudentView(e);
     console.log("Hola student");
   });
 
-  $('.navbar').on('click','.nav-teacher', e => {
+  $('.superior-nav').on('click','.nav-teacher', e => {
+    teacher.showTeacherView(e);
     console.log("Hola teacher");
   });
 
-  $('.navbar').on('click','.nav-class', e => {
+  $('.superior-nav').on('click','.nav-class', e => {
     console.log("Hola class");
   });
   /*#####################
   # Email
   #####################*/
-  $(".main-view").on("click","button#email-send", function(event){
-    email.sendNewEmail(event, currentUser);
+  $(".main-view").on("submit","form.email-new-form", function(event){
+    email.sendNewEmail(event);
+  });
+
+  $(".main-view").on("submit","form.email-received-form", function(event){
+    email.answerEmail(event);
   });
 
   $(".main-view").on("click","button#email-cancel", function(event){
-    email.resetEmailInputs(event);
+    email.showEmailView(event);
   });
 
   $(".main-view").on("click","button#email-delete", function(){
     email.deleteEmail();
   });
 
-  $(".main-view").on("click","span.email-fav-icon", function(){
+  $(".main-view").on("click","div.email-fav-icon", function(){
     email.emailSetFav($(this));
   });
 
@@ -361,45 +237,6 @@ $(function() {
 
   $(".main-view").on("click","button#email-new", function(){
     email.showNewEmail();
-  });
-
-  /*#####################
-  # Responsible
-  #####################*/
-  if($(".responsible-view").length > 0){
-    console.log("update responsibles");
-    updateResponsibleList();
-  }
-
-  $("#responsible-delete").on("click", function(){
-    if($(".responsible-list table input[type='checkbox']:checked").length > 0){
-      if(confirm("¿Seguro que desea borrar los responsables?")){
-        $(".responsible-list table input[type='checkbox']:checked").each(function(index, element){
-          console.log($(element).closest("tr").data("id"));
-          Gb.rm($(element).closest("tr").data("id"));
-        })
-        updateResponsibleList();
-      }
-    }
-    else{
-      alert("Selecciona al menos un responsable");
-    }
-  });
-
-  $("#responsible-new").on("click", function(){
-
-    $(".responsible-container").empty().append(newResponsibleFormView());
-
-    $("#responsible-new-save").on("click", function(event){
-      createResponsible(event);
-    })
-
-    $("#responsible-new-cancel").on("click", function(event){
-      event.preventDefault();
-      if(confirm("¿Desea cancelar?"))
-        resetResponsibleInputs();
-    })
-
   });
 
   /*#####################
@@ -414,17 +251,27 @@ $(function() {
     addLoader(elem);
     Gb.login(user, password).then(d =>{
       if(d !== undefined){
-        currentUser = user;
-        populate().then(()=>{
-          showSuperiorNavBar();
-          email.showEmailView();
-          removeLoader(elem);
-        })
+          if(Gb.globalState.classes.length == 0) {
+            populate(["1A", "1B"], 2, 4, 1, 3, 0).then(()=>{
+              showSuperiorNavBar();
+              email.showEmailView();
+            })
+          }else{
+            showSuperiorNavBar();
+            email.showEmailView();
+          }
+            
       }
       else{
         console.log("error");
+        removeLoader(elem);
       }
     })
+    
+    /*.catch(e=>{
+      removeLoader(elem);
+      $(".main-view").append($("<p class='text-danger justify-content-center d-flex'>Datos de acceso incorrectos</p>"));
+    });*/
   });
 
   /*#####################
@@ -434,15 +281,18 @@ $(function() {
   $(".superior-nav").on("click","button#logout", e=>{
     e.preventDefault();
     if(confirm("¿Quieres cerrar la sesión?")){
-      Gb.logout().then(d =>{
-        if(d !== undefined){
-          showLoginForm();
-          currentUser = "";
-        }
-        else{
-          console.log("error");
-        }
-      })
+      try{
+        Gb.logout().then(d =>{
+          if(d !== undefined){
+            showLoginForm();
+          }
+          else{
+            console.log("error");
+          }
+        })
+      }catch(e){
+        console.log("error", e);
+      }
     }
   });
 
