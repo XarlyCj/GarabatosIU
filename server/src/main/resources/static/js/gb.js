@@ -314,25 +314,25 @@ $(function() {
   /*#####################
    # NAVBAR
    #####################*/
-  $('.navbar').on('click', '.nav-email', e => {
+  $('.superior-nav').on('click', '.nav-email', e => {
     email.showEmailView(e);
     console.log("Hola email");
   });
 
-  $('.navbar').on("click",'.nav-responsible', e => {
+  $('.superior-nav').on("click",'.nav-responsible', e => {
     console.log("Hola responsible");
   });
 
-  $('.navbar').on('click','.nav-student', e => {
+  $('.superior-nav').on('click','.nav-student', e => {
     student.showStudentView(e);
     console.log("Hola student");
   });
 
-  $('.navbar').on('click','.nav-teacher', e => {
+  $('.superior-nav').on('click','.nav-teacher', e => {
     console.log("Hola teacher");
   });
 
-  $('.navbar').on('click','.nav-class', e => {
+  $('.superior-nav').on('click','.nav-class', e => {
     console.log("Hola class");
   });
   /*#####################
@@ -342,15 +342,19 @@ $(function() {
     email.sendNewEmail(event);
   });
 
+  $(".main-view").on("submit","form.email-received-form", function(event){
+    email.answerEmail(event);
+  });
+
   $(".main-view").on("click","button#email-cancel", function(event){
-    email.resetEmailInputs(event);
+    email.showEmailView(event);
   });
 
   $(".main-view").on("click","button#email-delete", function(){
     email.deleteEmail();
   });
 
-  $(".main-view").on("click","span.email-fav-icon", function(){
+  $(".main-view").on("click","div.email-fav-icon", function(){
     email.emailSetFav($(this));
   });
 
@@ -413,16 +417,25 @@ $(function() {
     addLoader(elem);
     Gb.login(user, password).then(d =>{
       if(d !== undefined){
-        populate(["1A", "1B"], 2, 4, 1, 3, 5).then(()=>{
-          showSuperiorNavBar();
-          email.showEmailView();
-          removeLoader(elem);
-        })
+          if(Gb.classes.length == 0) {
+            populate(["1A", "1B"], 2, 4, 1, 3, 0).then(()=>{
+              showSuperiorNavBar();
+              email.showEmailView();
+            })
+          }else{
+            showSuperiorNavBar();
+            email.showEmailView();
+          }
+            
       }
       else{
         console.log("error");
+        removeLoader(elem);
       }
-    })
+    }).catch(e=>{
+      removeLoader(elem);
+      $(".main-view").append($("<p class='text-danger'>Datos de acceso incorrectos</p>"));
+    });
   });
 
   /*#####################
@@ -432,14 +445,18 @@ $(function() {
   $(".superior-nav").on("click","button#logout", e=>{
     e.preventDefault();
     if(confirm("¿Quieres cerrar la sesión?")){
-      Gb.logout().then(d =>{
-        if(d !== undefined){
-          showLoginForm();
-        }
-        else{
-          console.log("error");
-        }
-      })
+      try{
+        Gb.logout().then(d =>{
+          if(d !== undefined){
+            showLoginForm();
+          }
+          else{
+            console.log("error");
+          }
+        })
+      }catch(e){
+        console.log("error", e);
+      }
     }
   });
 

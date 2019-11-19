@@ -17,12 +17,12 @@ function createEmailItem(msg, index) {
     if(msg.labels.includes(Gb.MessageLabels.READ)) read = 'light';
     let html = '';
     html += '<li data-id=' + msg.msgid + ' class="row">' +
-        ' <div class="col-md-1 align-middle h3 email-fav-icon align-slef-center ' + fav + '">☆</div>' +
+        ' <div class="col-md-1 align-middle h3 email-fav-icon align-self-center ' + fav + '">☆</div>' +
         ' <div class="col-md-7 font-weight-' + read + ' email-item item">' +
         '   <p class="h5">' + msg.from + '</p>' +
         '   <p class="h7">' + msg.subject + '</p>' +
         ' </div>' +
-        ' <div class="col-md-3 email-item item align-self-center">' + getFormattedDate(msg.date) + '</div>' +
+        ' <div class="col-md-3 email-item item align-self-center font-weight-' + read + '">' + getFormattedDate(msg.date) + '</div>' +
         ' <div class="col-md-1 align-middle align-self-center">' +
         '   <div class="form-check float-right">' +
         '     <input class="form-check-input" type="checkbox" value="" id="email-check-' + index + '">' +
@@ -37,8 +37,9 @@ function createEmailItem(msg, index) {
 
 function emailSetFav(elem){
     let msgid = $(elem).closest("li").data("id");
+    console.log("msgid", msgid);
     let msg = Gb.resolve(msgid);
-    if(msg.labels.includes(Gb.MessageLabels.FAV)){
+    if(!msg.labels.includes(Gb.MessageLabels.FAV)){
         msg.labels.push(Gb.MessageLabels.FAV);
         $(elem).addClass("font-weight-bold text-warning");
     }
@@ -47,27 +48,26 @@ function emailSetFav(elem){
         msg.labels.splice(pos, 1);
         $(elem).removeClass("font-weight-bold text-warning");
     }
-    Gb.set(msg).then(()=> updateEmailList());
+    Gb.set(msg);
 }
 
 function answerEmail(event){
     event.preventDefault();
-    let toValue = $("#email-from").text();
-    let fromValue = "yo";
+    let toValue = $("#email-from").data("id");
+    let fromValue = Gb.globalState.users[0].uid;
     let title = $("#email-title").text();
     let body = $("#email-body").val();
-    toValue = toValue.split(",");
     let msg = new Gb.Message(Gb.Util.randomText(), new Date(), fromValue, toValue, ["sent"], title, body);
     Gb.send(msg);
     alert("¡Mensaje enviado!");
-    updateEmailList();
+    showEmailView();
 }
 
 function updateEmailList(){
     try {
         $(".email-list ul").empty();
         Gb.globalState.messages.forEach((m, index) =>  {
-            if(m.to == Gb.globalState.users[0].uid)
+            if(m.to.includes(Gb.globalState.users[0].uid))
                 $(".email-list ul").append(createEmailItem(m, index))
         });
     } catch (e) {
@@ -77,8 +77,7 @@ function updateEmailList(){
 
 function resetEmailInputs(event) {
     if(event !== undefined) event.preventDefault();
-    $("#email-to").val("");
-    $("#email-cc").val("");
+    $('.selectpicker').selectpicker('deselectAll');
     $("#email-subject").val("");
     $("#email-body").val("");
 }
@@ -91,7 +90,8 @@ function newEmailFormView(){
             '   <div class="col-sm-10">' +
             '     <select class="selectpicker" multiple data-live-search="true" id="email-to" data-width="100%" required>';
     Gb.globalState.users.forEach(u=>{
-        html += '   <option value="' + u.uid + '">'+ u.first_name + " " + u.last_name  +'</option>'
+        if(u.uid != Gb.globalState.users[0].uid)
+            html += '<option value="' + u.uid + '">'+ u.first_name + " " + u.last_name  +'</option>'
     });
     html += '     </select>' + 
             '   </div>' +
@@ -101,7 +101,8 @@ function newEmailFormView(){
             '    <div class="col-sm-10">' +
             '      <select class="selectpicker" multiple data-live-search="true" id="email-cc" data-width="100%">';
     Gb.globalState.users.forEach(u=>{
-        html += '   <option value="' + u.uid + '">'+ u.first_name + " " + u.last_name  +'</option>'
+        if(u.uid != Gb.globalState.users[0].uid)
+            html += '<option value="' + u.uid + '">'+ u.first_name + " " + u.last_name  +'</option>'
     });
     html += '     </select>' +
             '    </div>' +
@@ -117,7 +118,7 @@ function newEmailFormView(){
             '  </div>' +
             '  <div class="form-row  justify-content-between" style="margin-top: 20px">' +
             '    <div class="">' +
-            '      <button class="btn btn-danger" id="email-cancel" type="submit">Cancelar</button>' +
+            '      <button class="btn btn-danger" id="email-cancel">Cancelar</button>' +
             '    </div>' +
             '    <div class="">' +
             '      <button class="btn btn-success" id="email-send" type="submit">Enviar</button>' +
@@ -127,36 +128,51 @@ function newEmailFormView(){
     return $(html);
 }
 
-function receivedEmailFormView(mensaje){
+function receivedEmailFormView(msg){
+    if(!msg.labels.includes(Gb.MessageLabels.READ)){
+        msg.labels.push(Gb.MessageLabels.READ);
+        Gb.set(msg).then(()=>{
+            $("li[data-id='" + msg.msgid + "'] .item").toggleClass("font-weight-bold font-weight-light");
+        } );
+    }
+    let fromName = Gb.resolve(msg.from).first_name + " " + Gb.resolve(msg.from).last_name;
+    let toName = Gb.resolve(msg.to).first_name + " " + Gb.resolve(msg.to).last_name;
     let html = '';
-    html += '<form>' +
+    html += '<form class="email-received-form">' +
         ' <div class="form-group row">' +
         '   <label for="formGroupExampleInput" class="col-sm-2 col-form-label">Emisor:</label>' +
         '   <div class="col-sm-10 my-auto">' +
-        '     <span id="email-from">' + mensaje.from + '</span>' +
+        '     <span id="email-from" data-id="' + msg.from + '">' + fromName + '</span>' +
         '   </div>' +
         ' </div>' +
         ' <div class="form-group row">' +
         '   <label for="formGroupExampleInput" class="col-sm-2 col-form-label">Asunto:</label>' +
         '   <div class="col-sm-10 my-auto">' +
-        '     <span id="email-title">' + mensaje.title + '</span>' +
+        '     <span id="email-title">' + msg.subject + '</span>' +
+        '   </div>' +
+        ' </div>' +
+        ' <div class="form-group row">' +
+        '   <label for="formGroupExampleInput" class="col-sm-2 col-form-label">Fecha:</label>' +
+        '   <div class="col-sm-10 my-auto">' +
+        '     <span id="email-date">' + getFormattedDate(msg.date) + '</span>' +
         '   </div>' +
         ' </div>' +
         ' <div>' +
-        '   <textarea style="height:100px;width:100%;" disabled>' + mensaje.body + '</textarea>' +
+        '   <textarea style="height:100px;width:100%;" disabled>' + msg.body + '</textarea>' +
         ' </div>' +
         ' <div class="form-group">' +
         '   <textarea id="email-body" class="form-control" style="height:400px;">' +
         '\n\n\n' +
         '--------------------------------------------------------------------------\n' +
-        'De: ' + mensaje.from + '\n' +
-        'Para: ' + mensaje.to + '\n' +
-        mensaje.body +
+        'De: ' + fromName + '\n' +
+        'Para: ' + toName + '\n' +
+        'Fecha: ' + getFormattedDate(msg.date) + '\n' +
+        msg.body +
         '   </textarea>' +
         ' </div>' +
         ' <div class="form-row  justify-content-between" style="margin-top: 20px">' +
         '   <div class="">' +
-        '     <button class="btn btn-danger" id="email-cancel" type="submit">Cancelar</button>' +
+        '     <button class="btn btn-danger" id="email-cancel">Cancelar</button>' +
         '   </div>' +
         '   <div class="">' +
         '     <button class="btn btn-success" id="email-send" type="submit">Enviar</button>' +
@@ -203,7 +219,8 @@ function deleteEmail(){
     }
 }
 
-function showEmailView(){
+function showEmailView(e){
+    if(e !== undefined) e.preventDefault();
     $(".main-view").empty().append(
         $('<div class="email-list list container-fluid mt-2"></div>' +
             '<div class="email-container form-container mt-2"></div>'));
@@ -219,17 +236,16 @@ function showList(){
         '<div class="row container-fluid mt-2">' +
         '   <input class="form-control" type="search" placeholder="Buscar" />' +
         '</div>' +
-        '<ul class="container-fluid mt-2"></ul>' +
-        '<hr/>';
+        '<hr/>' +
+        '<ul class="container-fluid mt-2"></ul>';
     $(".main-view .email-list").append($(html));
     updateEmailList();
 }
 
 function showReceivedEmail(elem){
-    let msgid = $(elem).data("id");
-    $(".email-container").empty().append(receivedEmailFormView(Gb.globalState.messages.find(m => {
-        if(m.msgid == msgid) return m;
-    })));
+    let msgid = $(elem).closest("li").data("id");
+    if(!$(".email-list").hasClass("col-md-3")) $(".email-list").addClass("col-md-3");
+    $(".email-container").empty().append(receivedEmailFormView(Gb.resolve(msgid)));
 }
 
 function showNewEmail(){
