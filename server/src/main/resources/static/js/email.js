@@ -66,17 +66,19 @@ function answerEmail(event){
 function updateEmailList(filter){
     try {
         $(".email-list ul").empty();
-        let array = [];
-        if(filter !== undefined){
-            array = filter;
+        if(filter !== undefined || Gb.globalState.messages.length > 0){
+            let array = [];
+            if(filter !== undefined){
+                array = filter;
+            }
+            else{
+                array = Gb.globalState.messages;
+            }
+            array.forEach((m, index) =>  {
+                if(m.to.includes(Gb.globalState.users[0].uid) && m.labels.includes(Gb.MessageLabels.RECVD))
+                    $(".email-list ul").append(createEmailItem(m, index))
+            });
         }
-        else{
-            array = Gb.globalState.messages;
-        }
-        array.forEach((m, index) =>  {
-            if(m.to.includes(Gb.globalState.users[0].uid))
-                $(".email-list ul").append(createEmailItem(m, index))
-        });
     } catch (e) {
         console.log('Error actualizando', e);
     }
@@ -247,6 +249,13 @@ function showList(){
         '   </div>' +
         '</div>' +
         '<hr/>' +
+        '<div class="btn-group container-fluid" role="group" aria-label="Filtros mensajes">' +
+        '   <button type="button" class="btn btn-secondary email-filter active" data-filter="all">Todos</button>' +
+        '   <button type="button" class="btn btn-secondary email-filter" data-filter="' + Gb.MessageLabels.FAV + '">Favoritos</button>' +
+        //'   <button type="button" class="btn btn-secondary email-filter" data-filter="' + Gb.MessageLabels.SENT + '">Enviados</button>' +
+        '   <button type="button" class="btn btn-secondary email-filter" data-filter="' + Gb.MessageLabels.READ + '">No leídos</button>' +
+        '</div>' +
+        '<hr/>' +
         '<ul class="container-fluid mt-2"></ul>';
     $(".main-view .email-list").append($(html));
     updateEmailList();
@@ -266,13 +275,35 @@ function showNewEmail(){
 
 function searchEmail(){
     let filter = $("#email-searcher").val();
-    console.log("filter", filter);
     let result = Gb.globalState.messages.filter(m => {
-        if(m.from.includes(filter) || m.subject.includes(filter) || m.body.includes(filter)) return true;
+        let fromName = Gb.resolve(m.from).first_name + " " + Gb.resolve(m.from).last_name;
+        if(fromName.toLowerCase().includes(filter) || m.subject.toLowerCase().includes(filter) || m.body.toLowerCase().includes(filter)) return true;
         else return false;
     });
-    console.log("result", result);
     updateEmailList(result);
+}
+
+function filterList(elem){
+    $(elem).closest("div.btn-group").find(".email-filter.active").removeClass("active");
+    $(elem).addClass("active");
+
+    let filter = $(elem).data("filter");
+    if(filter == "all"){
+        updateEmailList();
+    }
+    else if(filter == Gb.MessageLabels.READ){
+        let result = Gb.globalState.messages.filter(m => {
+            if(!m.labels.includes(Gb.MessageLabels.READ) && m.labels.includes(Gb.MessageLabels.RECVD)) return true;
+            else return false;
+        });
+        updateEmailList(result);
+    }else{
+        let result = Gb.globalState.messages.filter(m => {
+            if(m.labels.includes(filter) && m.labels.includes(Gb.MessageLabels.RECVD)) return true;
+            else return false;
+        });
+        updateEmailList(result);
+    }
 }
 
 export {
@@ -284,5 +315,6 @@ export {
     showReceivedEmail,
     showNewEmail,
     showEmailView,
-    searchEmail
+    searchEmail,
+    filterList
 }
