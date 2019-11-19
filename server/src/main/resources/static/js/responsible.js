@@ -12,7 +12,7 @@ function createresponsibleItem(r, index){
                   <div class="responsible-index" > ${r.first_name} ${r.last_name} </div>
                 </li>`;
 
-    $(".responsible-list").append(html);
+    $(".responsible-list ul").append(html);
 }
 
 function showList(){
@@ -151,7 +151,6 @@ function updateresponsibleList(){
     });
 }
 
-/* Handlers */
 function createResponsible(event){
     event.preventDefault();
     let param = {},

@@ -3,6 +3,7 @@ import * as email from './email.js'
 import * as student from './student.js'
 import * as teacher from './teachers.js'
 import * as responsible from './responsible.js'
+import * as classes from './class.js'
 
 
 
@@ -210,6 +211,7 @@ $(function() {
   });
 
   $('.superior-nav').on('click','.nav-class', e => {
+    classes.showClassesView()
     $(".superior-nav .nav-item.active").removeClass("active");
     $(".superior-nav .nav-item.nav-class").addClass("active");
   });
