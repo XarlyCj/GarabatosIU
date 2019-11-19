@@ -7,10 +7,15 @@ function showStudentView(){
 }
 
 function createStudentItem(s, index){
-
-    let html = `<li data-index="${index}" data-sid="${s.sid}" data-firstname="${s.firstName}" data-lastname="${s.lastName}" data-cid="${s.cid}" class="row student-li list-group-item">
-                  <div class="student-index" >${s.firstName} ${s.lastName} ( Class: ${s.cid} )</div>
-                </li>`;
+    let guardians = s.guardians.map(g=>{
+      return Gb.resolve(g).first_name + " " + Gb.resolve(g).last_name;
+    });
+    let html = `<li data-index="${index}" data-sid="${s.sid}" data-firstname="${s.firstName}" data-lastname="${s.lastName}" data-cid="${s.cid}" class="row student-li">
+                  <div class="student-index item col-md-3" >${s.firstName} ${s.lastName} </div>
+                  <div class="student-index item col-md-3"> Clase: ${s.cid}</div>
+                  <div class="student-index item col-md-6"> Responsables: ${guardians.join(",")}</div>
+                </li>
+                <hr/>`;
 
     $(".student-list ul").append(html);
 }
@@ -26,7 +31,8 @@ function showList(){
                         <button class="btn btn-outline-secondary" id="student-search" type="button">Buscar</button>
                     </div>
                 </div>
-                <ul class="container-fluid mt-2 list-group-flush list-group"></ul>`;
+                <hr/>
+                <ul class="container-fluid mt-2"></ul>`;
 
     $(".main-view .student-list").append($(html));
 
@@ -73,17 +79,16 @@ function showList(){
         $('.main-view .student-container').empty().append(newForm);
     });
 
-    $('#student-search').on('click', event => {
-        let string = $('input#student-search-input').val();
-        if( string === '' || string === undefined){
-            updateStudentList(undefined);
-        }else{
-            let students = searchStudents(string);
-            updateStudentList(students);
-        }
-    });
-
     updateStudentList();
+}
+
+function searchStudent(){
+  let filter = $("#student-search-input").val();
+  let result = Gb.globalState.students.filter(s => {
+      if(s.firstName.toLowerCase().includes(filter) || s.lastName.toLowerCase().includes(filter) || s.cid.includes(filter) || s.guardians.includes(filter)) return true;
+      else return false;
+  });
+  updateStudentList(result);
 }
 
 function updateStudentList(students){
@@ -181,8 +186,11 @@ function createStudent(event){
 
   let s = new Gb.Student(param.sid, param.firstName, param.lastName, param.cid, [] );
   try {
-      Gb.addStudent(s).then( updateStudentList() );
-      alert('El alumno se ha creado con exito');
+      Gb.addStudent(s).then(()=> {
+        alert('El alumno se ha creado con exito');
+        updateStudentList(); 
+      });
+      
   } catch (e) {
       alert('Alumno ya existe con ese ID');
   }
@@ -210,5 +218,6 @@ export {
     showStudentView,
     createStudent,
     deleteStudent,
-    editStudent
+    editStudent,
+    searchStudent
 }

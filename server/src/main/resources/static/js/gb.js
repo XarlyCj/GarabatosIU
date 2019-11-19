@@ -188,22 +188,31 @@ $(function() {
    #####################*/
   $('.superior-nav').on('click', '.nav-email', e => {
     email.showEmailView(e);
+    $(".superior-nav .nav-item.active").removeClass("active");
+    $(".superior-nav .nav-item.nav-email").addClass("active");
   });
 
   $('.superior-nav').on("click",'.nav-responsible', e => {
     responsible.showResponsibleView(e);
+    $(".superior-nav .nav-item.active").removeClass("active");
+    $(".superior-nav .nav-item.nav-responsible").addClass("active");
   });
 
   $('.superior-nav').on('click','.nav-student', e => {
     student.showStudentView(e);
+    $(".superior-nav .nav-item.active").removeClass("active");
+    $(".superior-nav .nav-item.nav-student").addClass("active");
   });
 
   $('.superior-nav').on('click','.nav-teacher', e => {
     teacher.showTeacherView(e);
+    $(".superior-nav .nav-item.active").removeClass("active");
+    $(".superior-nav .nav-item.nav-teacher").addClass("active");
   });
 
   $('.superior-nav').on('click','.nav-class', e => {
-    clases.showClassesView(e);
+    $(".superior-nav .nav-item.active").removeClass("active");
+    $(".superior-nav .nav-item.nav-class").addClass("active");
   });
   /*#####################
   # Email
@@ -238,13 +247,15 @@ $(function() {
 
   $(".main-view").on("click","button#email-search", function(){
     email.searchEmail();
-    console.log("click");
   });
 
   $(".main-view").on("keyup","input#email-searcher", function(event){
-    console.log("keyup");
     if (event.keyCode === 13)
       email.searchEmail();
+  });
+
+  $(".main-view").on("click","button.email-filter", function(){
+    email.filterList($(this));
   });
 
   /*#####################
@@ -262,8 +273,9 @@ $(function() {
   $(".main-view").on("submit", "form.student-edit-form", e=>{
     student.editStudent(e);
   });
+  
   /*#####################
-  # Student
+  # Responsible
   #####################*/
   
   $(".main-view").on("submit", "form.responsible-create-form", e=>{
@@ -276,6 +288,31 @@ $(function() {
 
   $(".main-view").on("submit", "form.responsible-edit-form", e=>{
     responsible.editResponsible(e);
+  });
+
+  $(".main-view").on("click","button#student-search", function(){
+    student.searchStudent();
+  });
+
+  $(".main-view").on("keyup","input#student-search-input", function(event){
+    if (event.keyCode === 13)
+      student.searchStudent();
+  });
+
+  /*#####################
+  # Teacher
+  #####################*/
+  
+  $(".main-view").on("submit", "form.teacher-create-form", e=>{
+    teacher.createTeacher(e);
+  });
+
+  $(".main-view").on("click", "button#teacher-delete", e=>{
+    teacher.deleteTeacher(e);
+  });
+
+  $(".main-view").on("submit", "form.teacher-edit-form", e=>{
+    teacher.editTeacher(e);
   });
 
   /*#####################
@@ -336,14 +373,8 @@ $(function() {
     e.preventDefault();
     if(confirm("¿Quieres cerrar la sesión?")){
       try{
-        Gb.logout().then(d =>{
-          if(d !== undefined){
-            showLoginForm();
-          }
-          else{
-            console.log("error");
-          }
-        })
+        Gb.logout();
+        showLoginForm();
       }catch(e){
         console.log("error", e);
       }

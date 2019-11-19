@@ -70,7 +70,7 @@ function showList(){
                              </div>
                              <div class='form-row  justify-content-between' style='margin-top: 20px'>
                                <div class=''>
-                                 <button class='btn btn-warning' id='teacher-create' >Crear</button>
+                                 <button class='btn btn-success' id='teacher-create' type="submit">Crear</button>
                                </div>
                              </div>
                         </form></div>`;
@@ -137,10 +137,10 @@ function updateTeacherList(){
                                  </div>
                                  <div class="form-row  justify-content-between" style="margin-top: 20px">
                                    <div class="">
-                                     <button class="btn btn-danger" id="teacher-edit" type="submit">Eliminar</button>
+                                     <button class="btn btn-danger" id="teacher-delete">Eliminar</button>
                                    </div>
                                    <div class="">
-                                     <button class="btn btn-warning" id="teacher-delete" type="submit">Editar</button>
+                                     <button class="btn btn-warning" id="teacher-edit" type="submit">Editar</button>
                                    </div>
                                  </div>
                             </form>
@@ -152,8 +152,7 @@ function updateTeacherList(){
 }
 
 /* Handlers */
-$('#teacher-create').click( event => {
-	console.log('creatingTeacher');
+function createTeacher(event){
     event.preventDefault();
     let param = {},
         inputs = $('.teacher-create-form .form-control');
@@ -170,28 +169,30 @@ $('#teacher-create').click( event => {
     } catch (e) {
         alert('Profesor ya existe con ese ID');
     }
+}
 
-});
-
-$('#teacher-delete').on('click', event => {
-	console.log('deletingTeacher');
-    event.preventDefault();
+function deleteTeacher(event){
+  event.preventDefault();
+  if(confirm("¿Seguro que desea borrar este profesor?")){
     let uid =  $('input[type=hidden]').val()
     Gb.rm(uid).then( updateTeacherList() );
-});
+  }
+}
 
-$('#teacher-edit').on('click', event => {
-	console.log('updatingTeacher');
-    event.preventDefault();
-    let uid         = $('input#uid').val();
-    let first_name  = $('input#firstname').val();
-    let last_name   = $('input#lastname').val();
-    let tels 		= $('input#tels').val().replace(/\s/g, '').split(',');
-    let classes     = $('input#classes').val().replace(/\s/g, '').split(',');
-    let s = new Gb.User(uid, 'teacher', first_name, last_name, tels, classes, [], 'SamplePass123');
-    Gb.set(s).then( updateTeacherList() );
-});
+function editTeacher(event){
+  event.preventDefault();
+  let uid         = $('input#uid').val();
+  let first_name  = $('input#first_name').val();
+  let last_name   = $('input#last_name').val();
+  let tels 		= $('input#tels').val().replace(/\s/g, '').split(',');
+  let classes     = $('input#classes').val().replace(/\s/g, '').split(',');
+  let s = new Gb.User(uid, 'teacher', first_name, last_name, tels, classes, [], 'SamplePass123');
+  Gb.set(s).then( updateTeacherList() );
+}
 
 export {
-    showTeacherView
+    showTeacherView,
+    createTeacher,
+    deleteTeacher,
+    editTeacher
 }
