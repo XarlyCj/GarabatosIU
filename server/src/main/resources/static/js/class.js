@@ -1,12 +1,12 @@
 import * as Gb from './gbapi.js'
 
-function showStudentView(){
+function showClassesView(){
     $(".main-view").empty().append(
         $(`<div class="Classes-list list container-fluid mt-2"></div><div class="classes-container form-container mt-2"></div>`));
     showList();
 }
 
-function createStudentItem(s, index){
+function createClasstItem(s, index){
 
     let html = `<li data-index="${index}" data-cid="${s.cid}" data-Name="${s.cid}" class="row classes-li list-group-item">
                   <div class="classes-index" >${s.cid}</div>
