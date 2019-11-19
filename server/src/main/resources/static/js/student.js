@@ -179,7 +179,7 @@ function createStudent(event){
       input.value = '';
   });
 
-  let s = new Gb.Student(param.sid, param.first_name, param.last_name, param.cid, [] );
+  let s = new Gb.Student(param.sid, param.firstName, param.lastName, param.cid, [] );
   try {
       Gb.addStudent(s).then( updateStudentList() );
       alert('El alumno se ha creado con exito');

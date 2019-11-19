@@ -260,6 +260,21 @@ $(function() {
   $(".main-view").on("submit", "form.student-edit-form", e=>{
     student.editStudent(e);
   });
+  /*#####################
+  # Student
+  #####################*/
+  
+  $(".main-view").on("submit", "form.responsible-create-form", e=>{
+    responsible.createResponsible(e);
+  });
+
+  $(".main-view").on("click", "button#responsible-delete", e=>{
+    responsible.deleteResponsible(e);
+  });
+
+  $(".main-view").on("submit", "form.responsible-edit-form", e=>{
+    responsible.editResponsible(e);
+  });
 
   /*#####################
   # Login
