@@ -6,7 +6,7 @@ function showClassesView(){
     showList();
 }
 
-function createClassItem(s, index){
+function createClassItem(c, index){
 
     let html = `<li  data-cid="${c.cid}" data-Name="${c.cid}" class="row classes-li list-group-item">
                   <div class="classes-index" >${c.cid}</div>
