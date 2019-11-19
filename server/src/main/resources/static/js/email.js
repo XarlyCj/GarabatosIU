@@ -1,5 +1,15 @@
 import * as Gb from './gbapi.js'
 
+function getFormattedDate(date){
+    date = new Date(date);
+    let day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+    let month = (date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
+    let year = date.getFullYear();
+    let hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+    let minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+    return day + "-" + month + "-" + year + " " + hours + ":" + minutes;
+}
+
 function createEmailItem(msg, index) {
     let fav = '';
     if(msg.labels.includes(Gb.MessageLabels.FAV)) fav = ' font-weight-bold text-warning';
@@ -10,9 +20,9 @@ function createEmailItem(msg, index) {
         ' <div class="col-md-1 align-middle h3 email-fav-icon align-slef-center ' + fav + '">☆</div>' +
         ' <div class="col-md-7 font-weight-' + read + ' email-item item">' +
         '   <p class="h5">' + msg.from + '</p>' +
-        '   <p class="h7">' + msg.title + '</p>' +
+        '   <p class="h7">' + msg.subject + '</p>' +
         ' </div>' +
-        ' <div class="col-md-3 email-item item align-self-center">' + msg.date + '</div>' +
+        ' <div class="col-md-3 email-item item align-self-center">' + getFormattedDate(msg.date) + '</div>' +
         ' <div class="col-md-1 align-middle align-self-center">' +
         '   <div class="form-check float-right">' +
         '     <input class="form-check-input" type="checkbox" value="" id="email-check-' + index + '">' +
@@ -37,6 +47,7 @@ function emailSetFav(elem){
         msg.labels.splice(pos, 1);
         $(elem).removeClass("font-weight-bold text-warning");
     }
+    Gb.set(msg).then(()=> updateEmailList());
 }
 
 function answerEmail(event){
@@ -55,7 +66,10 @@ function answerEmail(event){
 function updateEmailList(){
     try {
         $(".email-list ul").empty();
-        Gb.globalState.messages.forEach((m, index) =>  $(".email-list ul").append(createEmailItem(m, index)));
+        Gb.globalState.messages.forEach((m, index) =>  {
+            if(m.to == Gb.globalState.users[0].uid)
+                $(".email-list ul").append(createEmailItem(m, index))
+        });
     } catch (e) {
         console.log('Error actualizando', e);
     }
@@ -75,7 +89,7 @@ function newEmailFormView(){
             ' <div class="form-group row">' +
             '   <label for="email-to" class="col-sm-2 col-form-label">Para:</label>' +
             '   <div class="col-sm-10">' +
-            '     <select class="selectpicker" multiple data-live-search="true" id="email-to" data-width="100%">';
+            '     <select class="selectpicker" multiple data-live-search="true" id="email-to" data-width="100%" required>';
     Gb.globalState.users.forEach(u=>{
         html += '   <option value="' + u.uid + '">'+ u.first_name + " " + u.last_name  +'</option>'
     });
@@ -153,19 +167,26 @@ function receivedEmailFormView(mensaje){
     return $(html);
 }
 
-function sendNewEmail(event, user) {
-    event.preventDefault();
-    let toValue = $("#email-to").val();
-    let ccValue = $("#email-cc").val();
-    let fromValue = user;
-    let title = $("#email-subject").val();
-    let body = $("#email-body").val();
-    toValue = toValue.concat(ccValue);
-    let msg = new Gb.Message(Gb.Util.randomText(), new Date(), fromValue, toValue, ["sent"], title, body);
-    Gb.send(msg);
-    alert("¡Mensaje enviado!");
-    updateEmailList();
-    resetEmailInputs();
+function sendNewEmail(event) {
+    try{
+        event.preventDefault();
+        let toValue = $("#email-to").val();
+        let ccValue = $("#email-cc").val();
+        let fromValue = Gb.globalState.users[0].uid;
+        let title = $("#email-subject").val();
+        let body = $("#email-body").val();
+        toValue = toValue.concat(ccValue);
+        let msg = new Gb.Message(Gb.Util.randomText(), new Date(), fromValue, toValue, [], title, body);
+        Gb.send(msg).then(()=>{
+            alert("¡Mensaje enviado!");
+            updateEmailList();
+            resetEmailInputs();
+        });
+    }catch(e){
+        console.log(e);
+    }
+    
+    
 }
 
 function deleteEmail(){

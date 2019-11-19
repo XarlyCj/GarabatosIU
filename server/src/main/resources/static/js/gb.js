@@ -308,7 +308,6 @@ $(function() {
   // expone Gb para que esté accesible desde la consola
   window.Gb = Gb;
   const U = Gb.Util;
-  let currentUser = "";
 
 
   // muestra un mensaje de bienvenida
@@ -342,8 +341,8 @@ $(function() {
   /*#####################
   # Email
   #####################*/
-  $(".main-view").on("click","button#email-send", function(event){
-    email.sendNewEmail(event, currentUser);
+  $(".main-view").on("submit","form.email-new-form", function(event){
+    email.sendNewEmail(event);
   });
 
   $(".main-view").on("click","button#email-cancel", function(event){
@@ -417,8 +416,7 @@ $(function() {
     addLoader(elem);
     Gb.login(user, password).then(d =>{
       if(d !== undefined){
-        currentUser = user;
-        populate().then(()=>{
+        populate(["1A", "1B"], 2, 4, 1, 3, 5).then(()=>{
           showSuperiorNavBar();
           email.showEmailView();
           removeLoader(elem);
@@ -440,7 +438,6 @@ $(function() {
       Gb.logout().then(d =>{
         if(d !== undefined){
           showLoginForm();
-          currentUser = "";
         }
         else{
           console.log("error");
