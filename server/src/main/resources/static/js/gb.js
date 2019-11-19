@@ -272,8 +272,9 @@ $(function() {
   $(".main-view").on("submit", "form.student-edit-form", e=>{
     student.editStudent(e);
   });
+  
   /*#####################
-  # Student
+  # Responsible
   #####################*/
   
   $(".main-view").on("submit", "form.responsible-create-form", e=>{
@@ -295,6 +296,22 @@ $(function() {
   $(".main-view").on("keyup","input#student-search-input", function(event){
     if (event.keyCode === 13)
       student.searchStudent();
+  });
+
+  /*#####################
+  # Teacher
+  #####################*/
+  
+  $(".main-view").on("submit", "form.teacher-create-form", e=>{
+    teacher.createTeacher(e);
+  });
+
+  $(".main-view").on("click", "button#teacher-delete", e=>{
+    teacher.deleteTeacher(e);
+  });
+
+  $(".main-view").on("submit", "form.teacher-edit-form", e=>{
+    teacher.editTeacher(e);
   });
 
   /*#####################
