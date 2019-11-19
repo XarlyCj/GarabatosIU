@@ -1,6 +1,8 @@
 import * as Gb from './gbapi.js'
 import * as email from './email.js'
 import * as student from './student.js'
+import * as teacher from './teachers.js'
+
 
 function showSuperiorNavBar(){
   try {
@@ -330,6 +332,7 @@ $(function() {
   });
 
   $('.navbar').on('click','.nav-teacher', e => {
+    teacher.showTeacherView(e);
     console.log("Hola teacher");
   });
 
