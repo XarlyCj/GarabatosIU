@@ -3,6 +3,7 @@ import * as email from './email.js'
 import * as student from './student.js'
 import * as teacher from './teachers.js'
 import * as responsible from './responsible.js'
+import * as clases from './class.js'
 
 
 
@@ -314,6 +315,21 @@ $(function() {
     teacher.editTeacher(e);
   });
 
+  /*#####################
+  # Classes
+  #####################*/
+  
+  $(".main-view").on("submit", "form.classes-create-form", e=>{
+    clases.createClasses(e);
+  });
+
+  $(".main-view").on("click", "button#classes-delete", e=>{
+    clases.deleteClasses(e);
+  });
+
+  $(".main-view").on("submit", "form.classes-edit-form", e=>{
+    clases.editClasses(e);
+  });
   /*#####################
   # Login
   #####################*/

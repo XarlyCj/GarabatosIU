@@ -1,15 +1,15 @@
 import * as Gb from './gbapi.js'
 
-function showStudentView(){
+function showClassesView(){
     $(".main-view").empty().append(
         $(`<div class="Classes-list list container-fluid mt-2"></div><div class="classes-container form-container mt-2"></div>`));
     showList();
 }
 
-function createStudentItem(s, index){
+function createClassItem(c){
 
-    let html = `<li data-index="${index}" data-cid="${s.cid}" data-Name="${s.cid}" class="row classes-li list-group-item">
-                  <div class="classes-index" >${s.cid}</div>
+    let html = `<li  data-cid="${c.cid}" data-Name="${c.cid}" class="row classes-li list-group-item">
+                  <div class="classes-index" >${c.cid}</div>
                 </li>`;
 
     $(".classes-list ul").append(html);
@@ -82,9 +82,9 @@ function updateClassesList(classes){
         classesList.empty();
 
         if(classes === undefined){
-            Gb.globalState.classes.forEach( (s, index) =>  classesList.append( createClassesItem(s, index) ) );
+            Gb.globalState.classes.forEach( c =>  classesList.append( createClassItem(c) ) );
         }else{
-            classes.forEach( (s, index) =>  classesList.append( createClassesItem(s, index) ) );
+            classes.forEach( c =>  classesList.append( createClassItem(c) ) );
         }
 
     } catch (e) {
@@ -132,10 +132,10 @@ function updateClassesList(classes){
                                 }
                                  <div class="form-row  justify-content-between" style="margin-top: 20px">
                                    <div class="">
-                                     <button class="btn btn-danger" id="student-delete">Eliminar</button>
+                                     <button class="btn btn-danger" id="class-delete">Eliminar</button>
                                    </div>
                                    <div class="">
-                                     <button class="btn btn-warning" id="student-edit" type="submit">Editar</button>
+                                     <button class="btn btn-warning" id="class-edit" type="submit">Editar</button>
                                    </div>
                                  </div>
                             </form>
@@ -172,7 +172,7 @@ function createClasses(event){
       input.value = '';
   });
 
-  let c = new Gb.classes(param.cid, param.students, param.teachers, [] );
+  let c = new Gb.Eclass(param.cid, param.students, param.teachers );
   try {
       Gb.addClass(c).then( updateClassesList() );
       alert('La clase se ha creado con exito');
@@ -194,7 +194,7 @@ function editClasses(event){
   let cid         = $('input#sid').val();
   let teachers  = $('input#firstname').val();
   let students   = $('input#lastname').val();
-  let c = new Gb.clase(cid, teachers, students, [] );
+  let c = new Gb.EClass(cid,students, teachers );
   Gb.set(c).then( updateClassesList() );
 }
 
