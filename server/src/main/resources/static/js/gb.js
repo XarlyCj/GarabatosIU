@@ -234,6 +234,17 @@ $(function() {
     email.showNewEmail();
   });
 
+  $(".main-view").on("click","button#email-search", function(){
+    email.searchEmail();
+    console.log("click");
+  });
+
+  $(".main-view").on("keyup","input#email-searcher", function(event){
+    console.log("keyup");
+    if (event.keyCode === 13)
+      email.searchEmail();
+  });
+
   /*#####################
   # Student
   #####################*/

@@ -63,10 +63,17 @@ function answerEmail(event){
     showEmailView();
 }
 
-function updateEmailList(){
+function updateEmailList(filter){
     try {
         $(".email-list ul").empty();
-        Gb.globalState.messages.forEach((m, index) =>  {
+        let array = [];
+        if(filter !== undefined){
+            array = filter;
+        }
+        else{
+            array = Gb.globalState.messages;
+        }
+        array.forEach((m, index) =>  {
             if(m.to.includes(Gb.globalState.users[0].uid))
                 $(".email-list ul").append(createEmailItem(m, index))
         });
@@ -233,8 +240,11 @@ function showList(){
         '   <button class="btn btn-primary" id="email-new">Nuevo mensaje</button>' +
         '   <button class="btn btn-danger" id="email-delete">Eliminar mensaje</button>' +
         '</div>' +
-        '<div class="row container-fluid mt-2">' +
-        '   <input class="form-control" type="search" placeholder="Buscar" />' +
+        '<div class="row input-group container-fluid mt-2">' +
+        '   <input type="search" id="email-searcher" class="form-control" placeholder="Buscar mensajes" aria-label="Buscar mensajes" aria-describedby="basic-addon2">' +
+        '   <div class="input-group-append">' +
+        '       <button class="btn btn-outline-secondary" id="email-search" type="button">Buscar</button>' +
+        '   </div>' +
         '</div>' +
         '<hr/>' +
         '<ul class="container-fluid mt-2"></ul>';
@@ -254,6 +264,17 @@ function showNewEmail(){
     $('select').selectpicker();
 }
 
+function searchEmail(){
+    let filter = $("#email-searcher").val();
+    console.log("filter", filter);
+    let result = Gb.globalState.messages.filter(m => {
+        if(m.from.includes(filter) || m.subject.includes(filter) || m.body.includes(filter)) return true;
+        else return false;
+    });
+    console.log("result", result);
+    updateEmailList(result);
+}
+
 export {
     emailSetFav,
     answerEmail,
@@ -262,5 +283,6 @@ export {
     deleteEmail,
     showReceivedEmail,
     showNewEmail,
-    showEmailView
+    showEmailView,
+    searchEmail
 }
