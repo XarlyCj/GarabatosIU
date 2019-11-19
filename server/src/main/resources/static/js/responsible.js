@@ -152,7 +152,7 @@ function updateresponsibleList(){
 }
 
 /* Handlers */
-$('#responsible-create').click( event => {
+function createResponsible(event){
     event.preventDefault();
     let param = {},
         inputs = $('.responsible-create-form .form-control');
@@ -162,23 +162,23 @@ $('#responsible-create').click( event => {
         input.value = '';
     });
 
-    let s = new Gb.User(param.uid, 'responsible', param.first_name, param.last_name, param.tels,[],param.student, 'pass');
+    let s = new Gb.User(param.uid, 'guardian', param.first_name, param.last_name, param.tels,[],param.student, 'pass');
     try {
         Gb.addUser(s).then( updateresponsibleList() );
         alert('El Responsable se ha creado con exito');
     } catch (e) {
         alert('Responsable ya existe con ese ID');
     }
-
-});
-
-$('#responsible-delete').on('click', event => {
+}
+function deleteResponsible(event){
     event.preventDefault();
     let uid =  $('input[type=hidden]').val()
     Gb.rm(uid).then( updateresponsibleList() );
-});
+    alert('El Responsable se ha borrado con exito');
+}
 
-$('#responsible-edit').on('click', event => {
+
+function editResponsible(event){
     event.preventDefault();
     let uid         = $('input#uid').val();
     let first_name  = $('input#firstname').val();
@@ -187,8 +187,10 @@ $('#responsible-edit').on('click', event => {
     let student     = $('input#student').val();
     let s = new Gb.User(uid, 'guardian', first_name, last_name, tels, [], student, 'pass');
     Gb.set(s).then( updateresponsibleList() );
-});
-
+}
 export {
-    showResponsibleView
+    showResponsibleView,
+    createResponsible,
+    deleteResponsible,
+    editResponsible
 }
