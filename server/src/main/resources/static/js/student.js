@@ -21,9 +21,9 @@ function showList(){
                     <button class="btn btn-danger" id="student-delete-massive">Eliminar Alumno</button>
                 </div>
                 <div class="row input-group container-fluid mt-2">
-                    <input type="text" class="form-control" placeholder="Buscar Alumno" aria-label="Buscar Alumno" aria-describedby="basic-addon2">
+                    <input type="text" class="form-control" id="student-search-input" placeholder="Buscar Alumno" aria-label="Buscar Alumno" aria-describedby="basic-addon2">
                     <div class="input-group-append">
-                        <button class="btn btn-search-students btn-outline-secondary" type="button">Buscar</button>
+                        <button class="btn btn-outline-secondary" id="student-search" type="button">Buscar</button>
                     </div>
                 </div>
                 <ul class="container-fluid mt-2 list-group-flush list-group"></ul>
@@ -31,7 +31,7 @@ function showList(){
 
     $(".main-view .student-list").append($(html));
 
-    $('#student-new').on('click', function (event) {
+    $('#student-new').on('click', event => {
 
         if(!$('.student-list').hasClass('col-md-3')){
             $('.student-list').addClass('col-md-3');
@@ -72,14 +72,28 @@ function showList(){
         $('.main-view .student-container').empty().append(newForm);
     });
 
+    $('#student-search').on('click', event => {
+        let string = $('input#student-search-input').val(),
+            students = searchStudents(string);
+        console.log(students);
+        updateStudentList(students);
+    });
+
     updateStudentList();
 }
 
-function updateStudentList(){
+function updateStudentList(students){
     try {
         let studentList = $(".student-list ul");
+
         studentList.empty();
-        Gb.globalState.students.forEach( (s, index) =>  studentList.append( createStudentItem(s, index) ) );
+
+        if(students === undefined){
+            Gb.globalState.students.forEach( (s, index) =>  studentList.append( createStudentItem(s, index) ) );
+        }else{
+            students.forEach( (s, index) =>  studentList.append( createStudentItem(s, index) ) );
+        }
+
     } catch (e) {
         console.log('Error actualizando', e);
     }
@@ -132,6 +146,21 @@ function updateStudentList(){
         $('.student-list').addClass('col-md-3');
         $('.main-view .student-container').empty().append(editForm);
     });
+}
+
+function searchStudents(string){
+    let students = [];
+    Gb.globalState.students.forEach( (student, index) => {
+        $.each(student, (key, val) => {
+            console.log("val", val, "string", string);
+            let flag = false;
+            if( val.includes(string) && !flag ){
+                students.push(student);
+                flag = true;
+            }
+        })
+    });
+    return students;
 }
 
 /* Handlers */
