@@ -316,6 +316,15 @@ $(function() {
     teacher.editTeacher(e);
   });
 
+  $(".main-view").on("click","button#teacher-search", function(){
+    teacher.searchTeacher();
+  });
+
+  $(".main-view").on("keyup","input#teacher-search-input", function(event){
+    if (event.keyCode === 13)
+    teacher.searchTeacher();
+  });
+
   /*#####################
   # Classes
   #####################*/

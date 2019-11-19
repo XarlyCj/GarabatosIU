@@ -12,7 +12,7 @@ function createTeacherItem(t, index){
                   <div class="teacher-index" > ${t.first_name} ${t.last_name} </div>
                 </li>`;
 
-    $(".teacher-list").append(html);
+    $(".teacher-list ul").append(html);
 }
 
 function showList(){
@@ -21,13 +21,12 @@ function showList(){
                     <button class="btn btn-danger" id="teacher-delete-massive">Eliminar Profesor</button>
                 </div>
                 <div class="row input-group container-fluid mt-2">
-                    <input type="text" class="form-control" placeholder="Buscar Profesor" aria-label="Buscar Profesor" aria-describedby="basic-addon2">
+                    <input type="text" class="form-control" id="teacher-search-input" placeholder="Buscar Profesor" aria-label="Buscar Profesor" aria-describedby="basic-addon2">
                     <div class="input-group-append">
-                        <button class="btn btn-search-teachers btn-outline-secondary" type="button">Buscar</button>
+                        <button class="btn btn-outline-secondary" id="teacher-search" type="button">Buscar</button>
                     </div>
                 </div>
-                <ul class="container-fluid mt-2 list-group-flush list-group"></ul>
-                <hr/>`;
+                <ul class="container-fluid mt-2 list-group-flush list-group"></ul>`;
 
     $(".main-view .teacher-list").append($(html));
 
@@ -81,15 +80,34 @@ function showList(){
     updateTeacherList();
 }
 
-function updateTeacherList(){
+function searchTeacher(){
+  let filter = $("#teacher-search-input").val();
+  let result = Gb.globalState.users.filter(s => {
+      if(s.first_name.toLowerCase().includes(filter) || s.last_name.toLowerCase().includes(filter) || s.classes.includes(filter) || s.tels.includes(filter)) return true;
+      else return false;
+  });
+  updateTeacherList(result);
+}
+
+
+function updateTeacherList(teachers){
     try {
         let teacherList = $(".teacher-list ul");
         teacherList.empty();
-        Gb.globalState.users.forEach( function(t, index){ 
-        	if (t.type === 'teacher') {
-        		teacherList.append( createTeacherItem(t, index) )
-        	}
-        });
+
+        if (teachers === undefined){
+          Gb.globalState.users.forEach( function(t, index){ 
+            if (t.type === 'teacher') {
+              teacherList.append( createTeacherItem(t, index) )
+            }
+          });
+        }else{
+          teachers.forEach( function(t, index){ 
+            if (t.type === 'teacher') {
+              teacherList.append( createTeacherItem(t, index) )
+            }
+          });
+        }
     } catch (e) {
         console.log('Error actualizando', e);
     }
@@ -194,5 +212,6 @@ export {
     showTeacherView,
     createTeacher,
     deleteTeacher,
-    editTeacher
+    editTeacher,
+    searchTeacher
 }
