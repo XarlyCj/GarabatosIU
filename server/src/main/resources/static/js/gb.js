@@ -211,7 +211,6 @@ $(function() {
   });
 
   $('.superior-nav').on('click','.nav-class', e => {
-  clases.showClassesView(e);
     $(".superior-nav .nav-item.active").removeClass("active");
     $(".superior-nav .nav-item.nav-class").addClass("active");
   });
