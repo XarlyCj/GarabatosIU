@@ -118,7 +118,7 @@ function updateTeacherList(){
                                    </div>
                                  </div>
                                  <div class="form-group row">
-                                   <label for="last_name" class="col-sm-2 col-form-label">Apellido:</label>
+                                   <label for="last_name" class="col-sm-2 col-form-label">Apellidos:</label>
                                    <div class="col-sm-10">
                                      <input type="text" class="form-control" id="last_name" value="${last_name}">
                                    </div>
@@ -153,6 +153,7 @@ function updateTeacherList(){
 
 /* Handlers */
 $('#teacher-create').click( event => {
+	console.log('creatingTeacher');
     event.preventDefault();
     let param = {},
         inputs = $('.teacher-create-form .form-control');
@@ -162,7 +163,7 @@ $('#teacher-create').click( event => {
         input.value = '';
     });
 
-    let s = new Gb.User(param.uid, 'teacher', param.first_name, param.last_name, param.tels, param.classes, [], 'pass');
+    let s = new Gb.User(param.uid, 'teacher', param.first_name, param.last_name, param.tels.replace(/\s/g, '').split(','), param.classes.replace(/\s/g, '').split(','), [], 'SamplePass123');
     try {
         Gb.addUser(s).then( updateTeacherList() );
         alert('El profesor se ha creado con exito');
@@ -173,19 +174,21 @@ $('#teacher-create').click( event => {
 });
 
 $('#teacher-delete').on('click', event => {
+	console.log('deletingTeacher');
     event.preventDefault();
     let uid =  $('input[type=hidden]').val()
     Gb.rm(uid).then( updateTeacherList() );
 });
 
 $('#teacher-edit').on('click', event => {
+	console.log('updatingTeacher');
     event.preventDefault();
     let uid         = $('input#uid').val();
     let first_name  = $('input#firstname').val();
     let last_name   = $('input#lastname').val();
-    let tels 		= $('input#tels').val();
-    let classes     = $('input#classes').val();
-    let s = new Gb.User(uid, 'teacher', first_name, last_name, tels, classes, [], 'pass');
+    let tels 		= $('input#tels').val().replace(/\s/g, '').split(',');
+    let classes     = $('input#classes').val().replace(/\s/g, '').split(',');
+    let s = new Gb.User(uid, 'teacher', first_name, last_name, tels, classes, [], 'SamplePass123');
     Gb.set(s).then( updateTeacherList() );
 });
 
