@@ -12,7 +12,7 @@ function createStudentItem(s, index){
                   <div class="student-index" >${s.firstName} ${s.lastName} ( Class: ${s.cid} )</div>
                 </li>`;
 
-    $(".student-list").append(html);
+    $(".student-list ul").append(html);
 }
 
 function showList(){
@@ -26,8 +26,7 @@ function showList(){
                         <button class="btn btn-outline-secondary" id="student-search" type="button">Buscar</button>
                     </div>
                 </div>
-                <ul class="container-fluid mt-2 list-group-flush list-group"></ul>
-                <hr/>`;
+                <ul class="container-fluid mt-2 list-group-flush list-group"></ul>`;
 
     $(".main-view .student-list").append($(html));
 
@@ -37,7 +36,8 @@ function showList(){
             $('.student-list').addClass('col-md-3');
         }
 
-        let newForm = `<div style='padding: 89px;'><form class='student-create-form'>
+        let newForm = `<div style='padding: 89px;'>
+                        <form class='student-create-form'>
                             <div class='form-group row'>
                               <label for='sid' class='col-sm-2 col-form-label'>DNI:</label>
                               <div class='col-sm-10'>
@@ -64,28 +64,33 @@ function showList(){
                              </div>
                              <div class='form-row  justify-content-between' style='margin-top: 20px'>
                                <div class=''>
-                                 <button class='btn btn-warning' id='student-create' >Crear</button>
+                                 <button class='btn btn-success' id='student-create' type="submit">Crear</button>
                                </div>
                              </div>
-                        </form></div>`;
+                        </form>
+                      </div>`;
 
         $('.main-view .student-container').empty().append(newForm);
     });
 
     $('#student-search').on('click', event => {
-        let string = $('input#student-search-input').val(),
-            students = searchStudents(string);
-        console.log(students);
-        updateStudentList(students);
+        let string = $('input#student-search-input').val();
+        if( string === '' || string === undefined){
+            updateStudentList(undefined);
+        }else{
+            let students = searchStudents(string);
+            updateStudentList(students);
+        }
     });
 
     updateStudentList();
 }
 
 function updateStudentList(students){
-    try {
-        let studentList = $(".student-list ul");
 
+    try{
+
+        let studentList = $(".student-list ul");
         studentList.empty();
 
         if(students === undefined){
@@ -134,10 +139,10 @@ function updateStudentList(students){
                                  </div>
                                  <div class="form-row  justify-content-between" style="margin-top: 20px">
                                    <div class="">
-                                     <button class="btn btn-danger" id="student-edit" type="submit">Eliminar</button>
+                                     <button class="btn btn-danger" id="student-delete">Eliminar</button>
                                    </div>
                                    <div class="">
-                                     <button class="btn btn-warning" id="student-delete" type="submit">Editar</button>
+                                     <button class="btn btn-warning" id="student-edit" type="submit">Editar</button>
                                    </div>
                                  </div>
                             </form>
@@ -146,6 +151,7 @@ function updateStudentList(students){
         $('.student-list').addClass('col-md-3');
         $('.main-view .student-container').empty().append(editForm);
     });
+
 }
 
 function searchStudents(string){
@@ -163,43 +169,46 @@ function searchStudents(string){
     return students;
 }
 
-/* Handlers */
-$('#student-create').click( event => {
-    event.preventDefault();
-    let param = {},
-        inputs = $('.student-create-form .form-control');
+function createStudent(event){
+  event.preventDefault();
+  let param = {},
+      inputs = $('.student-create-form .form-control');
 
-    $.each(inputs, function (key, input) {
-        param[input.id] = input.value;
-        input.value = '';
-    });
+  $.each(inputs, function (key, input) {
+      param[input.id] = input.value;
+      input.value = '';
+  });
 
-    let s = new Gb.Student(param.sid, param.first_name, param.last_name, param.cid, [] );
-    try {
-        Gb.addStudent(s).then( updateStudentList() );
-        alert('El alumno se ha creado con exito');
-    } catch (e) {
-        alert('Alumno ya existe con ese ID');
-    }
+  let s = new Gb.Student(param.sid, param.first_name, param.last_name, param.cid, [] );
+  try {
+      Gb.addStudent(s).then( updateStudentList() );
+      alert('El alumno se ha creado con exito');
+  } catch (e) {
+      alert('Alumno ya existe con ese ID');
+  }
+}
 
-});
-
-$('#student-delete').on('click', event => {
-    event.preventDefault();
+function deleteStudent(event){
+  event.preventDefault();
+  if(confirm("¿Seguro que desea borrar este alumno?")){
     let sid =  $('input[type=hidden]').val()
     Gb.rm(sid).then( updateStudentList() );
-});
+  }
+}
 
-$('#student-edit').on('click', event => {
-    event.preventDefault();
-    let sid         = $('input#sid').val();
-    let first_name  = $('input#firstname').val();
-    let last_name   = $('input#lastname').val();
-    let cid         = $('input#cid').val();
-    let s = new Gb.Student(sid, first_name, last_name, cid, [] );
-    Gb.set(s).then( updateStudentList() );
-});
+function editStudent(event){
+  event.preventDefault();
+  let sid         = $('input#sid').val();
+  let first_name  = $('input#firstname').val();
+  let last_name   = $('input#lastname').val();
+  let cid         = $('input#cid').val();
+  let s = new Gb.Student(sid, first_name, last_name, cid, [] );
+  Gb.set(s).then( updateStudentList() );
+}
 
 export {
-    showStudentView
+    showStudentView,
+    createStudent,
+    deleteStudent,
+    editStudent
 }

@@ -187,26 +187,21 @@ $(function() {
    #####################*/
   $('.superior-nav').on('click', '.nav-email', e => {
     email.showEmailView(e);
-    console.log("Hola email");
   });
 
   $('.superior-nav').on("click",'.nav-responsible', e => {
     responsible.showResponsibleView(e);
-    console.log("Hola responsible");
   });
 
   $('.superior-nav').on('click','.nav-student', e => {
     student.showStudentView(e);
-    console.log("Hola student");
   });
 
   $('.superior-nav').on('click','.nav-teacher', e => {
     teacher.showTeacherView(e);
-    console.log("Hola teacher");
   });
 
   $('.superior-nav').on('click','.nav-class', e => {
-    console.log("Hola class");
   });
   /*#####################
   # Email
@@ -237,6 +232,22 @@ $(function() {
 
   $(".main-view").on("click","button#email-new", function(){
     email.showNewEmail();
+  });
+
+  /*#####################
+  # Student
+  #####################*/
+  
+  $(".main-view").on("submit", "form.student-create-form", e=>{
+    student.createStudent(e);
+  });
+
+  $(".main-view").on("click", "button#student-delete", e=>{
+    student.deleteStudent(e);
+  });
+
+  $(".main-view").on("submit", "form.student-edit-form", e=>{
+    student.editStudent(e);
   });
 
   /*#####################
